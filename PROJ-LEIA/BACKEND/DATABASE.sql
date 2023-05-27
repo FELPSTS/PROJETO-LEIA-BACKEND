@@ -12,13 +12,16 @@ select * from usuarios;
 
 CREATE TABLE projetos (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(45),
+    id_usuario INT,
     titulo TEXT,
-    codigosprojeto VARCHAR(1100),
-    FOREIGN KEY (username) REFERENCES usuarios (username)
+    codigosprojeto TEXT,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
 );
 
-select * from projetos;
+SELECT * FROM projetos WHERE  id_usuario = 1;
 
+
+
+select * from projetos;
 drop table projetos;
 drop database registros;
