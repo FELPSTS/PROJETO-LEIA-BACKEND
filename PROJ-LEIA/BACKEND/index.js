@@ -69,7 +69,10 @@ app.post("/login", (req, res) => {
       }
 
       if (result.length > 0) {
-        res.send({ msg: "Usuário logado com sucesso" });
+        const user = result[0];
+        const userid = user.id;
+        res.send({ /*msg: "Usuário logado com sucesso",*/ userId: userid  });
+
       } else {
         res.status(401).send({ msg: "Email ou senha incorretos" });
       }
@@ -107,17 +110,18 @@ app.get("/usuarios/:id", (req, res) => {
 /*--------------------------USURAIO----------------*/
 
 /*--------------------------PROJETOS----------------*/
-app.post("/projetos", (req, res) => {
+app.post("/savedocs", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
-  const codigosprojeto = req.body.codigosprojeto;
+  const codigosprojeto = req.body.content;
 
   db.query(
-    "SELECT * FROM projetos WHERE titulo = ?",
-    [titulo],
+    "SELECT * FROM projetos WHERE titulo = ? and id_usuario = ?",
+    [titulo , userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
+        res.send({ msg: "ERRO DE PUSH AO BD" });
         return;
       }
 
@@ -128,6 +132,7 @@ app.post("/projetos", (req, res) => {
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
+              res.send({ msg: "ERRO DE LIGAMENTO AO BD" });
               return;
             }
 
@@ -142,6 +147,32 @@ app.post("/projetos", (req, res) => {
 });
 
 /*--------------------------PROJETOS----------------*/
+
+/*---------------------------FORGOT----------------------*/
+
+/*---------------------------FORGOT----------------------*/
+
+/*---------------------------SEARCH----------------------*/
+/*app.post("/search", (req, res) => {
+  const userId = req.body.id_usuario;
+  const titulo = req.body.titulo;
+
+
+  db.query(
+    "SELECT * FROM projetos WHERE titulo like ? and userid = ?",
+    [titulo , userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+      if (result.length > 0) {
+        const userid = user;
+      }
+    })
+*/
+/*---------------------------SEARCH----------------------*/
+
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
