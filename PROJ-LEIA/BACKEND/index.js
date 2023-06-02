@@ -98,6 +98,25 @@ app.post("/getprojects", (req, res) => {
 
 /*---------------------------GETPROEJCTS----------------------*/
 
+/*---------------------------GETPROEJCTS----------------------*/
+/*
+app.put("/alter:id", (req, res) => {
+  const userId = req.params.id;
+  const { username, password } = req.body;
+  const newpassword = req.params.newpassword;
+
+  const sql = "UPDATE usuarios SET username = ?, password = ? WHERE id = ?";
+db.query(sql, [username, password, userId], (err, result) => {
+    (err, result) => {
+      res.status(500).send(err);
+      return;
+    };
+
+  res.send("Dados do usuário alterados com sucesso!");
+});
+*/
+/*---------------------------GETPROEJCTS----------------------*/
+
 /*--------------------------SAVEDOCS----------------*/
 app.post("/savedocs", (req, res) => {
   const userId = req.body.id_usuario;
