@@ -9,9 +9,9 @@ const db = mysql.createPool({
   password: "",
   database: "registros",
 });
-/--------------------------CONNECT BD----------------/
+/*--------------------------CONNECT BD----------------*/
 
-/--------------------------REGISTER----------------/
+/*--------------------------REGISTER----------------*/
 app.use(express.json());
 app.use(cors());
 app.use(
@@ -49,9 +49,9 @@ app.post("/register", (req, res) => {
   });
 });
 
-/--------------------------REGISTER----------------/
+/*--------------------------REGISTER----------------*/
 
-/--------------------------LOGIN----------------/
+/*--------------------------LOGIN---------------*/
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -68,7 +68,7 @@ app.post("/login", (req, res) => {
       if (result.length > 0) {
         const user = result[0];
         const userid = user.id;
-        res.send({ /msg: "Usuário logado com sucesso",/ userId: userid });
+        res.send({ /*msg: "Usuário logado com sucesso",*/ userId: userid });
       } else {
         res.status(401).send({ msg: "Email ou senha incorretos" });
       }
@@ -76,9 +76,9 @@ app.post("/login", (req, res) => {
   );
 });
 
-/--------------------------LOGIN----------------/
+/*--------------------------LOGIN----------------*/
 
-/---------------------------GETPROEJCTS----------------------/
+/*---------------------------GETPROEJCTS----------------------*/
 app.post("/getprojects", (req, res) => {
   const userId = req.body.id_usuario;
 
@@ -96,9 +96,9 @@ app.post("/getprojects", (req, res) => {
   );
 });
 
-/---------------------------GETPROEJCTS----------------------/
+/*---------------------------GETPROEJCTS----------------------*/
 
-/--------------------------SAVEDOCS----------------/
+/*--------------------------SAVEDOCS----------------*/
 app.post("/savedocs", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
@@ -136,32 +136,31 @@ app.post("/savedocs", (req, res) => {
   );
 });
 
-/--------------------------SAVEDOCS----------------/
+/*--------------------------SAVEDOCS----------------*/
 
-/---------------------------SEARCH----------------------/
-/*
+/*---------------------------SEARCH----------------------*/
+
 app.post("/search", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
 
   db.query(
-    "SELECT * FROM projetos WHERE titulo LIKE ? AND userid = ?",
-    [`%${titulo}%`, userId],
+    "SELECT * FROM projetos WHERE titulo LIKE CONCAT('%', ?, '%') AND id_usuario = ?",
+    [titulo, userId],
     (err, result) => {
       if (err) {
-        res.status(500).send(err);
+        res.status(510).send(err);
         return;
       }
 
-      if (result.length > 0) {
-      }
+      res.send(result);
     }
   );
 });
-*/
-/---------------------------SEARCH----------------------/
 
-/---------------------------FORGOT----------------------/
+/*---------------------------SEARCH----------------------*/
+
+/*---------------------------FORGOT----------------------*/
 /*
 app.post("/forgot", (req, res) => {
   const email = req.body.email;
@@ -229,7 +228,7 @@ function sendResetEmail(email, resetToken) {
   });
 }
 */
-/---------------------------FORGOT----------------------/
+/*---------------------------FORGOT----------------------*/
 
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
