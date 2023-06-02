@@ -9,9 +9,9 @@ const db = mysql.createPool({
   password: "",
   database: "registros",
 });
-/*--------------------------CONNECT BD----------------*/
+/--------------------------CONNECT BD----------------/
 
-/*--------------------------REGISTER----------------*/
+/--------------------------REGISTER----------------/
 app.use(express.json());
 app.use(cors());
 app.use(
@@ -49,9 +49,9 @@ app.post("/register", (req, res) => {
   });
 });
 
-/*--------------------------REGISTER----------------*/
+/--------------------------REGISTER----------------/
 
-/*--------------------------LOGIN----------------*/
+/--------------------------LOGIN----------------/
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -68,7 +68,7 @@ app.post("/login", (req, res) => {
       if (result.length > 0) {
         const user = result[0];
         const userid = user.id;
-        res.send({ /*msg: "Usuário logado com sucesso",*/ userId: userid });
+        res.send({ /msg: "Usuário logado com sucesso",/ userId: userid });
       } else {
         res.status(401).send({ msg: "Email ou senha incorretos" });
       }
@@ -76,9 +76,9 @@ app.post("/login", (req, res) => {
   );
 });
 
-/*--------------------------LOGIN----------------*/
+/--------------------------LOGIN----------------/
 
-/*---------------------------GETPROEJCTS----------------------*/
+/---------------------------GETPROEJCTS----------------------/
 app.post("/getprojects", (req, res) => {
   const userId = req.body.id_usuario;
 
@@ -96,32 +96,14 @@ app.post("/getprojects", (req, res) => {
   );
 });
 
-/*---------------------------GETPROEJCTS----------------------*/
+/---------------------------GETPROEJCTS----------------------/
 
-/*---------------------------GETPROEJCTS----------------------*/
-/*
-app.put("/alter:id", (req, res) => {
-  const userId = req.params.id;
-  const { username, password } = req.body;
-  const newpassword = req.params.newpassword;
-
-  const sql = "UPDATE usuarios SET username = ?, password = ? WHERE id = ?";
-db.query(sql, [username, password, userId], (err, result) => {
-    (err, result) => {
-      res.status(500).send(err);
-      return;
-    };
-
-  res.send("Dados do usuário alterados com sucesso!");
-});
-*/
-/*---------------------------GETPROEJCTS----------------------*/
-
-/*--------------------------SAVEDOCS----------------*/
+/--------------------------SAVEDOCS----------------/
 app.post("/savedocs", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
   const content = req.body.content;
+  const preview = req.body.preview;
 
   db.query(
     "SELECT * FROM projetos WHERE titulo = ? and id_usuario = ?",
@@ -135,8 +117,8 @@ app.post("/savedocs", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO projetos (id_usuario, titulo, content) VALUES (?, ?, ?)",
-          [userId, titulo, content],
+          "INSERT INTO projetos (id_usuario, titulo, content, preview) VALUES (?, ?, ?, ?)",
+          [userId, titulo, content, preview],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -154,9 +136,9 @@ app.post("/savedocs", (req, res) => {
   );
 });
 
-/*--------------------------SAVEDOCS----------------*/
+/--------------------------SAVEDOCS----------------/
 
-/*---------------------------SEARCH----------------------*/
+/---------------------------SEARCH----------------------/
 /*
 app.post("/search", (req, res) => {
   const userId = req.body.id_usuario;
@@ -177,9 +159,9 @@ app.post("/search", (req, res) => {
   );
 });
 */
-/*---------------------------SEARCH----------------------*/
+/---------------------------SEARCH----------------------/
 
-/*---------------------------FORGOT----------------------*/
+/---------------------------FORGOT----------------------/
 /*
 app.post("/forgot", (req, res) => {
   const email = req.body.email;
@@ -247,7 +229,7 @@ function sendResetEmail(email, resetToken) {
   });
 }
 */
-/*---------------------------FORGOT----------------------*/
+/---------------------------FORGOT----------------------/
 
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
