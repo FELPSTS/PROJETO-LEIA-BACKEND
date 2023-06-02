@@ -14,7 +14,8 @@ CREATE TABLE projetos (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT,
     titulo TEXT,
-    codigosprojeto TEXT,
+    content TEXT,
+    preview VARCHAR(150),
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
 );
 
