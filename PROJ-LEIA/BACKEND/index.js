@@ -160,6 +160,67 @@ app.post("/search", (req, res) => {
 
 /*---------------------------SEARCH----------------------*/
 
+/*---------------------------GETPROJECTBYID-------------------*/
+
+app.post("/getprojectbyid", (req, res) => {
+  const projectId = req.body.projectId;
+
+  db.query(
+    "SELECT * FROM projetos WHERE id = ?",
+    [projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETPROJECTBYID-------------------*/
+
+/*------------------------------ALTER--------------------------*/
+
+app.post("/alter", (req, res) => {
+  const userId = req.body.id_usuario;
+  const Aemail = req.body.email;
+  const Apassword = req.body.password;
+  const Npassword = req.body.newpassword;
+
+  db.query(
+    "SELECT * FROM usuarios WHERE userId = ? AND email = ? AND password = ?",
+    [userId, Aemail, Apassword],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      db.query(
+        "UPDATE usuarios SET password = ? Where userID= ?",
+        [Npassword, userId],
+        (err, resultInsert) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          res.send({ msg: "Alterado com sucesso" });
+        }
+      );
+    }
+  );
+});
+
+/*------------------------------ALTER--------------------------*/
+
 /*---------------------------FORGOT----------------------*/
 /*
 app.post("/forgot", (req, res) => {
