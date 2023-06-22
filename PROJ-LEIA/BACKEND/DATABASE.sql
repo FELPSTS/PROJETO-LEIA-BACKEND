@@ -15,14 +15,9 @@ CREATE TABLE projetos (
     id_usuario INT,
     titulo TEXT,
     content TEXT,
-    preview VARCHAR(150),
+    preview VARCHAR(1000),
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
 );
-
-SELECT * FROM projetos WHERE  id_usuario = 1;
-
-
-
 select * from projetos;
-drop table projetos;
+
 drop database registros;
