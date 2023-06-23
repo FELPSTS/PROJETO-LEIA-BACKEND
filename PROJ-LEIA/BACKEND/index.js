@@ -152,7 +152,6 @@ app.post("/savedocs", (req, res) => {
   );
 });
 
-
 /*--------------------------SAVEDOCS----------------*/
 
 /*---------------------------SEARCH----------------------*/
@@ -202,13 +201,12 @@ app.post("/getprojectbyid", (req, res) => {
 
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
-  const Aemail = req.body.email;
-  const Apassword = req.body.password;
+  const Apassword = req.body.oldpassword;
   const Npassword = req.body.newpassword;
 
   db.query(
-    "SELECT * FROM usuarios WHERE userId = ? AND email = ? AND password = ?",
-    [userId, Aemail, Apassword],
+    "SELECT * FROM usuarios WHERE id = ? AND password = ?",
+    [userId, Apassword],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -221,7 +219,7 @@ app.post("/alter", (req, res) => {
       }
 
       db.query(
-        "UPDATE usuarios SET password = ? Where userID= ?",
+        "UPDATE usuarios SET password = ? Where id= ?",
         [Npassword, userId],
         (err, resultInsert) => {
           if (err) {
@@ -237,6 +235,27 @@ app.post("/alter", (req, res) => {
 });
 
 /*------------------------------ALTER--------------------------*/
+
+/*------------------------------GETUSER--------------------------*/
+
+app.post("/getuser", (req, res) => {
+  const userId = req.body.id_usuario;
+
+  db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    if (result.length === 0) {
+      res.send({ msg: "Usuário não encontrado" });
+      return;
+    }
+    res.send(result);
+  });
+});
+
+/*------------------------------GETUSER--------------------------*/
 
 /*---------------------------FORGOT----------------------*/
 /*
