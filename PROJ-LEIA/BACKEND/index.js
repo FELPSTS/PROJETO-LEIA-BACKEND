@@ -106,12 +106,11 @@ app.post("/savedocs", (req, res) => {
   const preview = req.body.preview;
 
   db.query(
-    "SELECT * FROM projetos WHERE titulo = ? and id_usuario = ?",
+    "SELECT * FROM projetos WHERE titulo = ? AND id_usuario = ?",
     [titulo, userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
-        res.send({ msg: "ERRO DE PUSH AO BD" });
         return;
       }
 
@@ -122,7 +121,6 @@ app.post("/savedocs", (req, res) => {
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
-              res.send({ msg: "ERRO DE LIGAMENTO AO BD" });
               return;
             }
 
@@ -130,11 +128,30 @@ app.post("/savedocs", (req, res) => {
           }
         );
       } else {
-        res.status(400).send({ msg: "Projeto já está cadastrado" });
+        const projectId = result[0].id;
+
+        db.query(
+          "UPDATE projetos SET titulo = ?, content = ?, preview = ? WHERE id = ? AND id_usuario = ?",
+          [titulo, content, preview, projectId, userId],
+          (err, resultUpdate) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            if (resultUpdate.affectedRows === 0) {
+              res.status(404).send({ msg: "Projeto não encontrado" });
+              return;
+            }
+
+            res.send({ msg: "Projeto atualizado com sucesso" });
+          }
+        );
       }
     }
   );
 });
+
 
 /*--------------------------SAVEDOCS----------------*/
 
