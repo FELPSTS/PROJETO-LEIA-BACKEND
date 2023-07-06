@@ -78,29 +78,10 @@ app.post("/login", (req, res) => {
 
 /*--------------------------LOGIN----------------*/
 
-/*---------------------------GETPROEJCTS----------------------*/
-app.post("/getprojects", (req, res) => {
-  const userId = req.body.id_usuario;
-
-  db.query(
-    "SELECT * FROM projetos WHERE id_usuario = ?",
-    [userId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      res.send(result);
-    }
-  );
-});
-
-/*---------------------------GETPROEJCTS----------------------*/
-
 /*--------------------------SAVEDOCS----------------*/
 app.post("/savedocs", (req, res) => {
   const userId = req.body.id_usuario;
+  /*const folderID = req.body.folderID; */
   const titulo = req.body.titulo;
   const content = req.body.content;
   const preview = req.body.preview;
@@ -116,8 +97,8 @@ app.post("/savedocs", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO projetos (id_usuario, titulo, content, preview) VALUES (?, ?, ?, ?)",
-          [userId, titulo, content, preview],
+          "INSERT INTO projetos (id_usuario, titulo, content, preview) VALUES ( ?, ?, ?, ?)",
+          [userId, /*folderID*/ , titulo, content, preview],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -155,7 +136,6 @@ app.post("/savedocs", (req, res) => {
 /*--------------------------SAVEDOCS----------------*/
 
 /*---------------------------SEARCH----------------------*/
-
 app.post("/search", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
@@ -176,29 +156,7 @@ app.post("/search", (req, res) => {
 
 /*---------------------------SEARCH----------------------*/
 
-/*---------------------------GETPROJECTBYID-------------------*/
-
-app.post("/getprojectbyid", (req, res) => {
-  const projectId = req.body.projectId;
-
-  db.query(
-    "SELECT * FROM projetos WHERE id = ?",
-    [projectId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      res.send(result);
-    }
-  );
-});
-
-/*---------------------------GETPROJECTBYID-------------------*/
-
 /*------------------------------ALTER--------------------------*/
-
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
   const Apassword = req.body.oldpassword;
@@ -236,26 +194,159 @@ app.post("/alter", (req, res) => {
 
 /*------------------------------ALTER--------------------------*/
 
-/*------------------------------GETUSER--------------------------*/
-
-app.post("/getuser", (req, res) => {
+/*---------------------------------TEAMS------------------------------*/
+app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
+  const titulo = req.body.titulo;
+ /* const team_icon= req.body.team_icon; */
 
-  db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, result) => {
-    if (err) {
-      res.status(500).send(err);
-      return;
-    }
+  db.query(
+    "SELECT * FROM team WHERE titulo = ? AND id_usuario = ?",
+    [titulo, userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
 
-    if (result.length === 0) {
-      res.send({ msg: "Usuário não encontrado" });
-      return;
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO project (id_usuario, titulo) VALUES ( ?, ?, ?, ?)",
+          [userId , titulo, /*team_icon*/],
+          (err, resultInsert) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            res.send({ msg: "Cadastrado com êxito" });
+          }
+        )
+        }
+      }
+    )
+   }
+);
+ 
+/*---------------------------------TEAMS------------------------------*/
+
+/*---------------------------------CREATEPROJECT------------------------------*/
+app.post("/createproject", (req, res) => {
+  const userId = req.body.id_usuario;
+  const teamsID= req.body.id_temas;
+  const titulo = req.body.titulo;
+  const descricao = req.body.content;
+ /* const icon = req.body.icon; */
+
+  db.query(
+    "SELECT * FROM project WHERE titulo = ? AND id_usuario = ? and temasID",
+    [titulo, userId, teamsID],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO project (id_usuario, titulo, id_teams, descricao) VALUES ( ?, ?, ?, ?)",
+          [userId , titulo, teamsID, descricao, /*icon*/],
+          (err, resultInsert) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            res.send({ msg: "Cadastrado com êxito" });
+          }
+        )
+        }
+      }
+    )
+   }
+);
+
+/*---------------------------------CREATEPROJECT------------------------------*/
+
+/*---------------------------------CREATEFOLDER------------------------------*/
+app.post("/createfolder", (req, res) => {
+  const userId = req.body.id_usuario;
+  const id_project= req.body.id_project;
+  const titulo = req.body.titulo;
+ 
+
+  db.query(
+    "SELECT * FROM folder WHERE titulo = ? and id_project",
+    [titulo , id_project],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO folder (id_usuario, titulo, id_project) VALUES ( ?, ?, ?)",
+          [userId , titulo, id_project],
+          (err, resultInsert) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            res.send({ msg: "Cadastrado com êxito" });
+          }
+        )
+        }
+      }
+    )
+   }
+);
+
+/*---------------------------------CREATEFOLDER------------------------------*/
+
+/*--------------------------------------DELETEUSER------------------------------------*/
+app.post("/UserDelete", (req, res) => {
+  const userId = req.body.id_usuario;
+  const password = req.body.password;
+  const email = req.body.email;
+
+  db.query(
+    "SELECT * FROM usuarios WHERE id = ? AND email = ?",
+    [userId, email],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      db.query(
+        "DELETE FROM usuarios WHERE id = ? AND email = ? AND password = ?",
+        [userId, email, password],
+        (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Registro não encontrado" });
+          } else {
+            res.send({ msg: "Registro deletado com êxito" });
+          }
+        }
+      );
     }
-    res.send(result);
-  });
+  );
 });
 
-/*------------------------------GETUSER--------------------------*/
+/*--------------------------------------DELETEUSER------------------------------------*/
+
 
 /*---------------------------FORGOT----------------------*/
 /*
@@ -326,6 +417,66 @@ function sendResetEmail(email, resetToken) {
 }
 */
 /*---------------------------FORGOT----------------------*/
+
+/*------------------------------GETUSER--------------------------*/
+app.post("/getuser", (req, res) => {
+  const userId = req.body.id_usuario;
+
+  db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    if (result.length === 0) {
+      res.send({ msg: "Usuário não encontrado" });
+      return;
+    }
+    res.send(result);
+  });
+});
+
+/*------------------------------GETUSER--------------------------*/
+
+/*---------------------------GETPROJECTBYID-------------------*/
+app.post("/getprojectbyid", (req, res) => {
+  const projectId = req.body.projectId;
+
+  db.query(
+    "SELECT * FROM projetos WHERE id = ?",
+    [projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETPROJECTBYID-------------------*/
+
+/*---------------------------GETPROEJCTS----------------------*/
+app.post("/getprojects", (req, res) => {
+  const userId = req.body.id_usuario;
+
+  db.query(
+    "SELECT * FROM projetos WHERE id_usuario = ?",
+    [userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETPROEJCTS----------------------*/
 
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
