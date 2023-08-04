@@ -80,15 +80,16 @@ app.post("/login", (req, res) => {
 
 /*--------------------------SAVEDOCS----------------*/
 app.post("/savedocs", (req, res) => {
-  const userId = req.body.id_usuario;
-  /*const folderID = req.body.folderID; */
+  const projectId = req.body.id_project;
+  const docsId = req.body.docsId;
   const titulo = req.body.titulo;
   const content = req.body.content;
   const preview = req.body.preview;
+  
 
   db.query(
-    "SELECT * FROM projetos WHERE titulo = ? AND id_usuario = ?",
-    [titulo, userId],
+    "SELECT * FROM docs WHERE docsId = ? AND id_project = ?",
+    [docsId, projectId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -97,8 +98,8 @@ app.post("/savedocs", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO projetos (id_usuario, titulo, content, preview) VALUES ( ?, ?, ?, ?)",
-          [userId, /*folderID*/ , titulo, content, preview],
+          "INSERT INTO docs (id_project, titulo, content, preview) VALUES ( ?, ?, ?, ?)",
+          [projectId, titulo, content, preview],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -109,15 +110,16 @@ app.post("/savedocs", (req, res) => {
           }
         );
       } else {
-        const projectId = result[0].id;
+        
 
         db.query(
-          "UPDATE projetos SET titulo = ?, content = ?, preview = ? WHERE id = ? AND id_usuario = ?",
-          [titulo, content, preview, projectId, userId],
+          "UPDATE docs SET titulo = ?, content = ?, preview = ? WHERE id = ?",
+          [titulo, content, preview, docsId],
           (err, resultUpdate) => {
             if (err) {
               res.status(500).send(err);
               return;
+              cd;
             }
 
             if (resultUpdate.affectedRows === 0) {
@@ -135,14 +137,14 @@ app.post("/savedocs", (req, res) => {
 
 /*--------------------------SAVEDOCS----------------*/
 
-/*---------------------------SEARCH----------------------*/
-app.post("/search", (req, res) => {
-  const userId = req.body.id_usuario;
+/*---------------------------SEARCHDOCS----------------------*/
+app.post("/searchdocs", (req, res) => {
+  const projectId = req.body.id_project;
   const titulo = req.body.titulo;
 
   db.query(
-    "SELECT * FROM projetos WHERE titulo LIKE CONCAT('%', ?, '%') AND id_usuario = ?",
-    [titulo, userId],
+    "SELECT * FROM docs WHERE titulo LIKE CONCAT('%', ?, '%') AND id_project = ?",
+    [titulo, projectId],
     (err, result) => {
       if (err) {
         res.status(510).send(err);
@@ -154,8 +156,7 @@ app.post("/search", (req, res) => {
   );
 });
 
-/*---------------------------SEARCH----------------------*/
-
+/*---------------------------SEARCHDOCS----------------------*/
 /*------------------------------ALTER--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
@@ -193,12 +194,50 @@ app.post("/alter", (req, res) => {
 });
 
 /*------------------------------ALTER--------------------------*/
+/*------------------------------ALTERPROJECT--------------------------*/
+app.post("/alter", (req, res) => {
+  const userId = req.body.id_usuario;
+  const projectId = req.body.id_project;
+  const titulo = req.body.titulo;
+  const descricao = req.body.descricao;
+
+  db.query(
+    "SELECT * FROM project WHERE id_usuario = ? AND id = ?",
+    [userId, projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      db.query(
+        "UPDATE project SET titulo = ? AND descricao= ? Where id_project= ?",
+        [titulo,descricao,projectId],
+        (err, resultInsert) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          res.send({ msg: "Alterado com sucesso" });
+        }
+      );
+    }
+  );
+});
+
+/*------------------------------ALTERPROJECT--------------------------*/
 
 /*---------------------------------TEAMS------------------------------*/
 app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
- /* const team_icon= req.body.team_icon; */
+  /* const team_icon= req.body.team_icon; */
 
   db.query(
     "SELECT * FROM team WHERE titulo = ? AND id_usuario = ?",
@@ -212,7 +251,7 @@ app.post("/createteams", (req, res) => {
       if (result.length === 0) {
         db.query(
           "INSERT INTO project (id_usuario, titulo) VALUES ( ?, ?, ?, ?)",
-          [userId , titulo, /*team_icon*/],
+          [userId, titulo /*team_icon*/],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -221,26 +260,24 @@ app.post("/createteams", (req, res) => {
 
             res.send({ msg: "Cadastrado com êxito" });
           }
-        )
-        }
+        );
       }
-    )
-   }
-);
- 
+    }
+  );
+});
+
 /*---------------------------------TEAMS------------------------------*/
 
-/*---------------------------------CREATEPROJECT------------------------------*/
-app.post("/createproject", (req, res) => {
+/*---------------------------------SENDPROJECT------------------------------*/
+app.post("/sendproject", (req, res) => {
   const userId = req.body.id_usuario;
-  const teamsID= req.body.id_temas;
+  const projectId = req.body.projectId;
   const titulo = req.body.titulo;
-  const descricao = req.body.content;
- /* const icon = req.body.icon; */
+  const descricao = req.body.descricao;
 
   db.query(
-    "SELECT * FROM project WHERE titulo = ? AND id_usuario = ? and temasID",
-    [titulo, userId, teamsID],
+    "SELECT * FROM project WHERE titulo = ? AND id_usuario = ? ",
+    [titulo, userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -249,8 +286,8 @@ app.post("/createproject", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO project (id_usuario, titulo, id_teams, descricao) VALUES ( ?, ?, ?, ?)",
-          [userId , titulo, teamsID, descricao, /*icon*/],
+          "INSERT INTO project (id_usuario, titulo, descricao) VALUES ( ?, ?, ?, ?)",
+          [userId, titulo, descricao],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -259,25 +296,44 @@ app.post("/createproject", (req, res) => {
 
             res.send({ msg: "Cadastrado com êxito" });
           }
-        )
-        }
+        );
       }
-    )
-   }
-);
+      else{
+        db.query(
+          "UPDATE project SET titulo = ? AND descricao= ? WHERE id= ?",
+          [titulo,descricao,projectId],
+          (err, resultInsert) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+  
+            res.send({ msg: "Alterado com sucesso" });
+          }
+        );
+      }
+    }
+  );
+});
 
-/*---------------------------------CREATEPROJECT------------------------------*/
+/*---------------------------------SENDPROJECT------------------------------*/
+
+/*------------------------icon--------------------------------------*/
+/*------------------------icon--------------------------------------*/
+
+/*---------------------------FORGOT----------------------*/
+/*---------------------------FORGOT----------------------*/
+
 
 /*---------------------------------CREATEFOLDER------------------------------*/
 app.post("/createfolder", (req, res) => {
   const userId = req.body.id_usuario;
-  const id_project= req.body.id_project;
+  const id_project = req.body.id_project;
   const titulo = req.body.titulo;
- 
 
   db.query(
     "SELECT * FROM folder WHERE titulo = ? and id_project",
-    [titulo , id_project],
+    [titulo, id_project],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -287,7 +343,7 @@ app.post("/createfolder", (req, res) => {
       if (result.length === 0) {
         db.query(
           "INSERT INTO folder (id_usuario, titulo, id_project) VALUES ( ?, ?, ?)",
-          [userId , titulo, id_project],
+          [userId, titulo, id_project],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -296,12 +352,11 @@ app.post("/createfolder", (req, res) => {
 
             res.send({ msg: "Cadastrado com êxito" });
           }
-        )
-        }
+        );
       }
-    )
-   }
-);
+    }
+  );
+});
 
 /*---------------------------------CREATEFOLDER------------------------------*/
 
@@ -347,76 +402,167 @@ app.post("/UserDelete", (req, res) => {
 
 /*--------------------------------------DELETEUSER------------------------------------*/
 
+/*--------------------------------------DELETECARD------------------------------------*/
+app.post("/deletecard", (req, res) => {
+  const projectId = req.body.id_project;
+  const cardId = req.body.id_card;
 
-/*---------------------------FORGOT----------------------*/
-/*
-app.post("/forgot", (req, res) => {
-  const email = req.body.email;
+  db.query(
+    "SELECT * FROM docs WHERE id = ? AND id_project = ?",
+    [ cardId , projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
 
-  db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
-    if (err) {
-      res.status(500).send(err);
-      return;
-    }
-
-    if (result.length > 0) {
-      const userId = result[0].id;
-
-      const resetToken = generateResetToken();
+      if (result.length === 0) {
+        res.send({ msg: "Usuário não encontrado" });
+        return;
+      }
 
       db.query(
-        "UPDATE usuarios SET reset_token = ? WHERE id = ?",
-        [resetToken, userId],
-        (err) => {
+        "DELETE FROM card WHERE id = ? AND id_project = ?",
+        [ cardId , projectId],
+        (err, result) => {
           if (err) {
             res.status(500).send(err);
             return;
           }
 
-          sendResetEmail(email, resetToken);
-
-          res.send("E-mail enviado com sucesso!");
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Documento não encontrado" });
+          } else {
+            res.send({ msg: "Documento deletado com êxito" });
+          }
         }
       );
-    } else {
-      res.status(404).send("Usuário não encontrado.");
     }
-  });
+  );
 });
+/*--------------------------------------DELETEUCARD------------------------------------*/
 
-function generateResetToken() {
-  // Implemente a geração de um token de redefinição de senha aqui (você pode usar uma biblioteca como o uuid para gerar um token único)
-  // Por exemplo: return uuid.v4();
-}
+/*--------------------------------------DELETEPROJECTS------------------------------------*/
+app.post("/deleteprojects", (req, res) => {
+  const userId = req.body.id_usuario;
+  const projectId = req.body.id_projects;
 
-const nodemailer = require("nodemailer");
+  db.query(
+    "SELECT * FROM project WHERE id = ? AND id_usuario = ?",
+    [userId, projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
 
-function sendResetEmail(email, resetToken) {
-  const transporter = nodemailer.createTransport({
-    service: "seu_provedor_de_email",
-    auth: {
-      user: "seu_email",
-      pass: "sua_senha",
-    },
-  });
+      if (result.length === 0) {
+        res.send({ msg: "Usuário não encontrado" });
+        return;
+      }
 
-  const mailOptions = {
-    from: "seu_email@gmail.com",
-    to: email,
-    subject: "Redefinição de senha",
-    text: `Olá! Clique neste link para redefinir sua senha: ${resetToken}`,
-  };
+      db.query(
+        "DELETE FROM project WHERE id = ? AND id_usuario = ?",
+        [userId, projectId],
+        (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("E-mail enviado: " + info.response);
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Projeto não encontrado" });
+          } else {
+            res.send({ msg: "Projeto deletado com êxito" });
+          }
+        }
+      );
     }
+  );
+});
+/*--------------------------------------DELETEUPROJECTS------------------------------------*/
+
+/*--------------------------------------DELETEFOLDER------------------------------------*/
+app.post("/deletefolder", (req, res) => {
+    const userId = req.body.id_usuario;
+    const foldertId = req.body.foldertId;
+  
+    db.query(
+      "SELECT * FROM folder WHERE id = ? AND id_usuario = ?",
+      [foldertId, userId],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
+  
+        if (result.length === 0) {
+          res.send({ msg: "folder não encontrado" });
+          return;
+        }
+  
+        db.query(
+          "DELETE FROM folder WHERE id = ? AND id_usuario = ?",
+          [foldertId,userId],
+          (err, result) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+  
+            if (result.affectedRows === 0) {
+              res.status(500).send({ msg: "Projeto não encontrado" });
+            } else {
+              res.send({ msg: "Projeto deletado com êxito" });
+            }
+          }
+        );
+      }
+    );
   });
-}
-*/
-/*---------------------------FORGOT----------------------*/
+  /*--------------------------------------DELETEFOLDER------------------------------------*/
+
+/*--------------------------------------DELETETEAM------------------------------------*/
+app.post("/deleteteam", (req, res) => {
+  const userId = req.body.id_usuario;
+  const teamId = req.body.id_team;
+
+  db.query(
+    "SELECT * FROM team WHERE id = ? AND id_usuario = ?",
+    [userId, teamId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      db.query(
+        "DELETE FROM team WHERE id_usuario = ? AND id_team = ?",
+        [userId, teamId],
+        (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Projeto não encontrado" });
+          } else {
+            res.send({ msg: "Projeto deletado com êxito" });
+          }
+        }
+      );
+    }
+  );
+});
+/*--------------------------------------DELETETEAM------------------------------------*/
+
+
 
 /*------------------------------GETUSER--------------------------*/
 app.post("/getuser", (req, res) => {
@@ -438,13 +584,29 @@ app.post("/getuser", (req, res) => {
 
 /*------------------------------GETUSER--------------------------*/
 
-/*---------------------------GETPROJECTBYID-------------------*/
-app.post("/getprojectbyid", (req, res) => {
-  const projectId = req.body.projectId;
+/*---------------------------GETDOCSBYID-------------------*/
+app.post("/getdocumentbyid", (req, res) => {
+  const documentId = req.body.documentId;
+
+  db.query("SELECT * FROM docs WHERE id = ?", [documentId], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    res.send(result);
+  });
+});
+
+/*---------------------------GETDOCSBYID-------------------*/
+
+/*---------------------------GETDOCS----------------------*/
+app.post("/getdocs", (req, res) => {
+  const projectId = req.body.id_project;
 
   db.query(
-    "SELECT * FROM projetos WHERE id = ?",
-    [projectId],
+    "SELECT * FROM docs WHERE id_project = ?",
+    [userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -456,14 +618,14 @@ app.post("/getprojectbyid", (req, res) => {
   );
 });
 
-/*---------------------------GETPROJECTBYID-------------------*/
+/*---------------------------GETDOCS----------------------*/
 
 /*---------------------------GETPROEJCTS----------------------*/
 app.post("/getprojects", (req, res) => {
   const userId = req.body.id_usuario;
 
   db.query(
-    "SELECT * FROM projetos WHERE id_usuario = ?",
+    "SELECT * FROM project WHERE id_usuario = ?",
     [userId],
     (err, result) => {
       if (err) {

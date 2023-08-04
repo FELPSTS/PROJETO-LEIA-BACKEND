@@ -42,14 +42,14 @@ SELECT * FROM folder;
 
 CREATE TABLE docs (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_usuario INT NOT NULL,
+    id_project INT,
     id_folder INT,
     collaboration TEXT,
     titulo TEXT,
     content TEXT,
     preview VARCHAR(8000),
-    FOREIGN KEY (id_usuario) REFERENCES usuarios (id),
-    FOREIGN KEY (id_folder) REFERENCES folder (id)
+	FOREIGN KEY	(id_project) REFERENCES project(id),
+    FOREIGN KEY (id_folder)  REFERENCES folder(id)
 );
 SELECT * FROM docs;
 
@@ -57,5 +57,7 @@ DROP TABLE docs;
 DROP TABLE folder;
 DROP TABLE team;
 DROP TABLE usuarios;
+
+DELETE FROM docs WHERE id = 3 AND id_usuario = 1;
 
 DROP DATABASE registros;
