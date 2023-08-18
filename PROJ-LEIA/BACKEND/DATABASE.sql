@@ -4,9 +4,9 @@ USE registros;
 CREATE TABLE usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(45) UNIQUE,
-    email VARCHAR(45),
+    email VARCHAR(45) Not null,
     icon_user blob,
-    password VARCHAR(200)
+    password VARCHAR(200) Not null
 );
 SELECT * FROM usuarios; 
 
@@ -29,6 +29,7 @@ CREATE TABLE project (
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id),
     FOREIGN KEY (id_teams) REFERENCES team (id)
 );
+SELECT * FROM project;
 
 CREATE TABLE folder (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -56,8 +57,7 @@ SELECT * FROM docs;
 DROP TABLE docs;
 DROP TABLE folder;
 DROP TABLE team;
+DROP TABLE docs;
 DROP TABLE usuarios;
-
-DELETE FROM docs WHERE id = 3 AND id_usuario = 1;
 
 DROP DATABASE registros;
