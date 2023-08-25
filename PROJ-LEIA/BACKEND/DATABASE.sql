@@ -3,17 +3,17 @@ USE registros;
 
 CREATE TABLE usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(45) UNIQUE,
-    email VARCHAR(45) Not null,
+    username VARCHAR(45) UNIQUE NOT NULL,
+    email VARCHAR(45) NOT NULL,
     icon_user blob,
-    password VARCHAR(200) Not null
+    password VARCHAR(200) NOT NULL
 );
 SELECT * FROM usuarios; 
 
 CREATE TABLE team(
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_usuarios INT,
-    titulo TEXT,
+    titulo TEXT NOT NULL,
     team_icon blob,
     FOREIGN KEY (id_usuarios) REFERENCES usuarios (id)
 );
@@ -23,7 +23,7 @@ CREATE TABLE project (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT NOT NULL,
     id_teams INT,
-    titulo TEXT,
+    titulo TEXT NOT NULL,
     descricao TEXT,
     icon_project BLOB,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id),
@@ -35,7 +35,7 @@ CREATE TABLE folder (
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_project INT,
     id_usuario INT NOT NULL,
-    titulo TEXT,
+    titulo TEXT NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id),
     FOREIGN KEY (id_project) REFERENCES project (id)
 );
@@ -46,8 +46,8 @@ CREATE TABLE docs (
     id_project INT,
     id_folder INT,
     collaboration TEXT,
-    titulo TEXT,
-    content TEXT,
+    titulo TEXT NOT NULL,
+    content TEXT NOT NULL,
     preview VARCHAR(8000),
 	FOREIGN KEY	(id_project) REFERENCES project(id),
     FOREIGN KEY (id_folder)  REFERENCES folder(id)
