@@ -40,11 +40,11 @@ app.post("/register", (req, res) => {
             return;
           }
 
-          res.send({ msg: "Cadastrado com êxito" });
+          res.send({ msg: "Cadastrado com Ãªxito" });
         }
       );
     } else {
-      res.status(141).send({ msg: "Usuário já está cadastrado" });
+      res.status(141).send({ msg: "UsuÃ¡rio jÃ¡ estÃ¡ cadastrado" });
     }
   });
 });
@@ -68,7 +68,7 @@ app.post("/login", (req, res) => {
       if (result.length > 0) {
         const user = result[0];
         const userid = user.id;
-        res.send({ /*msg: "Usuário logado com sucesso",*/ userId: userid });
+        res.send({ /*msg: "UsuÃ¡rio logado com sucesso",*/ userId: userid });
       } else {
         res.status(401).send({ msg: "Email ou senha incorretos" });
       }
@@ -85,10 +85,9 @@ app.post("/savedocs", (req, res) => {
   const titulo = req.body.titulo;
   const content = req.body.content;
   const preview = req.body.preview;
-  
 
   db.query(
-    "SELECT * FROM docs WHERE docsId = ? AND id_project = ?",
+    "SELECT * FROM docs WHERE id = ? AND id_project = ?",
     [docsId, projectId],
     (err, result) => {
       if (err) {
@@ -106,12 +105,10 @@ app.post("/savedocs", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com êxito" });
+            res.send({ msg: "Cadastrado com Ãªxito" });
           }
         );
       } else {
-        
-
         db.query(
           "UPDATE docs SET titulo = ?, content = ?, preview = ? WHERE id = ?",
           [titulo, content, preview, docsId],
@@ -123,7 +120,7 @@ app.post("/savedocs", (req, res) => {
             }
 
             if (resultUpdate.affectedRows === 0) {
-              res.status(404).send({ msg: "Projeto não encontrado" });
+              res.status(404).send({ msg: "Projeto nÃ£o encontrado" });
               return;
             }
 
@@ -173,7 +170,7 @@ app.post("/alter", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -211,13 +208,13 @@ app.post("/alterproject", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
       db.query(
         "UPDATE project SET titulo = ? AND descricao= ? Where id_project= ?",
-        [titulo,descricao,projectId],
+        [titulo, descricao, projectId],
         (err, resultInsert) => {
           if (err) {
             res.status(500).send(err);
@@ -258,7 +255,7 @@ app.post("/createteams", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com êxito" });
+            res.send({ msg: "Cadastrado com Ãªxito" });
           }
         );
       }
@@ -294,20 +291,19 @@ app.post("/sendproject", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com êxito" });
+            res.send({ msg: "Cadastrado com Ãªxito" });
           }
         );
-      }
-      else{
+      } else {
         db.query(
           "UPDATE project SET titulo = ? AND descricao= ? WHERE id= ?",
-          [titulo,descricao,projectId],
+          [titulo, descricao, projectId],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
               return;
             }
-  
+
             res.send({ msg: "Alterado com sucesso" });
           }
         );
@@ -317,7 +313,6 @@ app.post("/sendproject", (req, res) => {
 });
 
 /*---------------------------------SENDPROJECT------------------------------*/
-
 
 /*---------------------------------CREATEFOLDER------------------------------*/
 app.post("/createfolder", (req, res) => {
@@ -344,7 +339,7 @@ app.post("/createfolder", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com êxito" });
+            res.send({ msg: "Cadastrado com Ãªxito" });
           }
         );
       }
@@ -370,7 +365,7 @@ app.post("/UserDelete", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -384,9 +379,9 @@ app.post("/UserDelete", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Registro não encontrado" });
+            res.status(500).send({ msg: "Registro nÃ£o encontrado" });
           } else {
-            res.send({ msg: "Registro deletado com êxito" });
+            res.send({ msg: "Registro deletado com Ãªxito" });
           }
         }
       );
@@ -403,7 +398,7 @@ app.post("/deletecard", (req, res) => {
 
   db.query(
     "SELECT * FROM docs WHERE id = ? AND id_project = ?",
-    [ cardId , projectId],
+    [cardId, projectId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -411,13 +406,13 @@ app.post("/deletecard", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
       db.query(
-        "DELETE FROM card WHERE id = ? AND id_project = ?",
-        [ cardId , projectId],
+        "DELETE FROM docs WHERE id = ? AND id_project = ?",
+        [cardId, projectId],
         (err, result) => {
           if (err) {
             res.status(500).send(err);
@@ -425,9 +420,9 @@ app.post("/deletecard", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Documento não encontrado" });
+            res.status(500).send({ msg: "Documento nÃ£o encontrado" });
           } else {
-            res.send({ msg: "Documento deletado com êxito" });
+            res.send({ msg: "Documento deletado com Ãªxito" });
           }
         }
       );
@@ -451,7 +446,7 @@ app.post("/deleteprojects", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -465,9 +460,9 @@ app.post("/deleteprojects", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto não encontrado" });
+            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
           } else {
-            res.send({ msg: "Projeto deletado com êxito" });
+            res.send({ msg: "Projeto deletado com Ãªxito" });
           }
         }
       );
@@ -478,43 +473,43 @@ app.post("/deleteprojects", (req, res) => {
 
 /*--------------------------------------DELETEFOLDER------------------------------------*/
 app.post("/deletefolder", (req, res) => {
-    const userId = req.body.id_usuario;
-    const foldertId = req.body.foldertId;
-  
-    db.query(
-      "SELECT * FROM folder WHERE id = ? AND id_usuario = ?",
-      [foldertId, userId],
-      (err, result) => {
-        if (err) {
-          res.status(500).send(err);
-          return;
-        }
-  
-        if (result.length === 0) {
-          res.send({ msg: "folder não encontrado" });
-          return;
-        }
-  
-        db.query(
-          "DELETE FROM folder WHERE id = ? AND id_usuario = ?",
-          [foldertId,userId],
-          (err, result) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
-  
-            if (result.affectedRows === 0) {
-              res.status(500).send({ msg: "Projeto não encontrado" });
-            } else {
-              res.send({ msg: "Projeto deletado com êxito" });
-            }
-          }
-        );
+  const userId = req.body.id_usuario;
+  const foldertId = req.body.foldertId;
+
+  db.query(
+    "SELECT * FROM folder WHERE id = ? AND id_usuario = ?",
+    [foldertId, userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
       }
-    );
-  });
-  /*--------------------------------------DELETEFOLDER------------------------------------*/
+
+      if (result.length === 0) {
+        res.send({ msg: "folder nÃ£o encontrado" });
+        return;
+      }
+
+      db.query(
+        "DELETE FROM folder WHERE id = ? AND id_usuario = ?",
+        [foldertId, userId],
+        (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
+          } else {
+            res.send({ msg: "Projeto deletado com Ãªxito" });
+          }
+        }
+      );
+    }
+  );
+});
+/*--------------------------------------DELETEFOLDER------------------------------------*/
 
 /*--------------------------------------DELETETEAM------------------------------------*/
 app.post("/deleteteam", (req, res) => {
@@ -531,7 +526,7 @@ app.post("/deleteteam", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -545,9 +540,9 @@ app.post("/deleteteam", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto não encontrado" });
+            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
           } else {
-            res.send({ msg: "Projeto deletado com êxito" });
+            res.send({ msg: "Projeto deletado com Ãªxito" });
           }
         }
       );
@@ -555,8 +550,6 @@ app.post("/deleteteam", (req, res) => {
   );
 });
 /*--------------------------------------DELETETEAM------------------------------------*/
-
-
 
 /*------------------------------GETUSER--------------------------*/
 app.post("/getuser", (req, res) => {
@@ -569,7 +562,7 @@ app.post("/getuser", (req, res) => {
     }
 
     if (result.length === 0) {
-      res.send({ msg: "Usuário não encontrado" });
+      res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
       return;
     }
     res.send(result);
@@ -634,14 +627,11 @@ app.post("/getprojects", (req, res) => {
 
 /*---------------------------GETPROEJCTS----------------------*/
 
-
-
 /*------------------------icon--------------------------------------*/
 /*------------------------icon--------------------------------------*/
 
 /*---------------------------FORGOT----------------------*/
 /*---------------------------FORGOT----------------------*/
-
 
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
