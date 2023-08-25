@@ -157,7 +157,7 @@ app.post("/searchdocs", (req, res) => {
 
 
 /*---------------------------SEARCHPROJECTS----------------------*/
-app.post("/searchprojects", (req, res) => {
+app.post("/searchproject", (req, res) => {
   const projectId = req.body.id_project;
   const titulo = req.body.titulo;
 
