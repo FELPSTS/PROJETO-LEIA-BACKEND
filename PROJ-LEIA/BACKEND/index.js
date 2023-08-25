@@ -283,7 +283,7 @@ app.post("/sendproject", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO project (id_usuario, titulo, descricao) VALUES ( ?, ?, ?, ?)",
+          "INSERT INTO project (id_usuario, titulo, descricao) VALUES ( ?, ?, ?)",
           [userId, titulo, descricao],
           (err, resultInsert) => {
             if (err) {
