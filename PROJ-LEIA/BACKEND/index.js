@@ -101,7 +101,7 @@ app.post("/savedocs", (req, res) => {
           [projectId, titulo, content, preview],
           (err, resultInsert) => {
             if (err) {
-              res.status(500).send(err);
+              res.status(200).send(err);
               return;
             }
 
@@ -114,7 +114,7 @@ app.post("/savedocs", (req, res) => {
           [titulo, content, preview, docsId],
           (err, resultUpdate) => {
             if (err) {
-              res.status(500).send(err);
+              res.status(201).send(err);
               return;
               cd;
             }
