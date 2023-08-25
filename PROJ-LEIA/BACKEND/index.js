@@ -268,7 +268,7 @@ app.post("/alterfolder", (req, res) => {
 });
 
 /*------------------------------ALTERFOLDER--------------------------*/
-/*---------------------------------TEAMS------------------------------*/
+/*---------------------------------SENDTEAMS------------------------------*/
 app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
@@ -302,7 +302,7 @@ app.post("/createteams", (req, res) => {
   );
 });
 
-/*---------------------------------TEAMS------------------------------*/
+/*---------------------------------SENDTEAMS------------------------------*/
 
 /*---------------------------------SENDPROJECT------------------------------*/
 app.post("/sendproject", (req, res) => {
@@ -665,6 +665,27 @@ app.post("/getprojects", (req, res) => {
 });
 
 /*---------------------------GETPROEJCTS----------------------*/
+
+
+/*---------------------------GETFOLDER----------------------*/
+app.post("/getfolder", (req, res) => {
+  const folderId = req.body.id_folder;
+
+  db.query(
+    "SELECT * FROM folder WHERE id= ?",
+    [folderId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETDOCS----------------------*/
 
 /*------------------------icon--------------------------------------*/
 /*------------------------icon--------------------------------------*/
