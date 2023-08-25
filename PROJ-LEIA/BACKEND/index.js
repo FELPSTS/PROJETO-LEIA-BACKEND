@@ -154,6 +154,28 @@ app.post("/searchdocs", (req, res) => {
 });
 
 /*---------------------------SEARCHDOCS----------------------*/
+
+
+/*---------------------------SEARCHPROJECTS----------------------*/
+app.post("/searchprojects", (req, res) => {
+  const projectId = req.body.id_project;
+  const titulo = req.body.titulo;
+
+  db.query(
+    "SELECT * FROM project WHERE titulo LIKE CONCAT('%', ?, '%') AND id_project = ?",
+    [titulo, projectId],
+    (err, result) => {
+      if (err) {
+        res.status(510).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------SEARCHDOCS----------------------*/
 /*------------------------------ALTERLOGIN--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
