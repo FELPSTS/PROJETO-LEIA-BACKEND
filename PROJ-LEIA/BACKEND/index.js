@@ -157,7 +157,7 @@ app.post("/searchdocs", (req, res) => {
 });
 
 /*---------------------------SEARCHDOCS----------------------*/
-/*------------------------------ALTER--------------------------*/
+/*------------------------------ALTERLOGIN--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
   const Apassword = req.body.oldpassword;
@@ -193,7 +193,7 @@ app.post("/alter", (req, res) => {
   );
 });
 
-/*------------------------------ALTER--------------------------*/
+/*------------------------------ALTERLOGIN--------------------------*/
 /*------------------------------ALTERPROJECT--------------------------*/
 app.post("/alterproject", (req, res) => {
   const userId = req.body.id_usuario;
