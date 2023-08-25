@@ -195,7 +195,7 @@ app.post("/alter", (req, res) => {
 
 /*------------------------------ALTER--------------------------*/
 /*------------------------------ALTERPROJECT--------------------------*/
-app.post("/alter", (req, res) => {
+app.post("/alterproject", (req, res) => {
   const userId = req.body.id_usuario;
   const projectId = req.body.id_project;
   const titulo = req.body.titulo;
@@ -317,7 +317,8 @@ app.post("/sendproject", (req, res) => {
 });
 
 /*---------------------------------SENDPROJECT------------------------------*/
-
+
+
 /*---------------------------------CREATEFOLDER------------------------------*/
 app.post("/createfolder", (req, res) => {
   const userId = req.body.id_usuario;
@@ -599,7 +600,7 @@ app.post("/getdocs", (req, res) => {
 
   db.query(
     "SELECT * FROM docs WHERE id_project = ?",
-    [userId],
+    [projectId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
