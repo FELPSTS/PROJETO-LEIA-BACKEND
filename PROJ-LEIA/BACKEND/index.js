@@ -379,7 +379,7 @@ app.post("/UserDelete", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Registro nÃ£o encontrado" });
+            res.status(404).send({ msg: "Registro nÃ£o encontrado" });
           } else {
             res.send({ msg: "Registro deletado com Ãªxito" });
           }
