@@ -230,11 +230,50 @@ app.post("/alterproject", (req, res) => {
 
 /*------------------------------ALTERPROJECT--------------------------*/
 
+/*------------------------------ALTERFOLDER--------------------------*/
+app.post("/alterfolder", (req, res) => {
+  const userId = req.body.id_usuario;
+  const folderId = req.body.id_folder;
+  const titulo = req.body.titulo;
+  const descricao = req.body.descricao;
+
+  db.query(
+    "SELECT * FROM folder WHERE id_usuario = ? AND id = ?",
+    [userId, folderId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "FOLDER nÃ£o encontrado" });
+        return;
+      }
+
+      db.query(
+        "UPDATE folder SET titulo = ? AND descricao= ? Where id_folder= ?",
+        [titulo, descricao, folderId],
+        (err, resultInsert) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          res.send({ msg: "Alterado com sucesso" });
+        }
+      );
+    }
+  );
+});
+
+/*------------------------------ALTERFOLDER--------------------------*/
 /*---------------------------------TEAMS------------------------------*/
 app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
   /* const team_icon= req.body.team_icon; */
+  
 
   db.query(
     "SELECT * FROM team WHERE titulo = ? AND id_usuario = ?",
@@ -247,7 +286,7 @@ app.post("/createteams", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO project (id_usuario, titulo) VALUES ( ?, ?, ?, ?)",
+          "INSERT INTO project (id_usuario, titulo) VALUES ( ?, ?)",
           [userId, titulo /*team_icon*/],
           (err, resultInsert) => {
             if (err) {
