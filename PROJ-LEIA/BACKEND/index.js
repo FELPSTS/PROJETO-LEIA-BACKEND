@@ -158,12 +158,13 @@ app.post("/searchdocs", (req, res) => {
 
 /*---------------------------SEARCHPROJECTS----------------------*/
 app.post("/searchproject", (req, res) => {
-  const projectId = req.body.id_project;
+  const userId = req.body.user_id;
   const titulo = req.body.titulo;
+  const team_id = req.body.team;
 
   db.query(
-    "SELECT * FROM project WHERE titulo LIKE CONCAT('%', ?, '%') AND id_project = ?",
-    [titulo, projectId],
+    "SELECT * FROM project WHERE titulo LIKE CONCAT('%', ?, '%') AND id_usuario = ? OR id_teams= ? ",
+    [titulo, userId, team_id],
     (err, result) => {
       if (err) {
         res.status(510).send(err);
@@ -174,8 +175,7 @@ app.post("/searchproject", (req, res) => {
     }
   );
 });
-
-/*---------------------------SEARCHDOCS----------------------*/
+/*---------------------------SEARCHPROJECTS----------------------*/
 /*------------------------------ALTERLOGIN--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
@@ -294,7 +294,6 @@ app.post("/alterfolder", (req, res) => {
 app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
-  /* const team_icon= req.body.team_icon; */
   
 
   db.query(
@@ -309,7 +308,7 @@ app.post("/createteams", (req, res) => {
       if (result.length === 0) {
         db.query(
           "INSERT INTO project (id_usuario, titulo) VALUES ( ?, ?)",
-          [userId, titulo /*team_icon*/],
+          [userId, titulo],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
@@ -497,22 +496,8 @@ app.post("/deleteprojects", (req, res) => {
   const userId = req.body.id_usuario;
   const projectId = req.body.id_projects;
 
-  db.query(
-    "SELECT * FROM project WHERE id = ? AND id_usuario = ?",
-    [userId, projectId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
-        return;
-      }
-
       db.query(
-        "DELETE FROM project WHERE id = ? AND id_usuario = ?",
+        "DELETE FROM project WHERE id_usuario = ? AND id = ?  ",
         [userId, projectId],
         (err, result) => {
           if (err) {
@@ -529,7 +514,6 @@ app.post("/deleteprojects", (req, res) => {
       );
     }
   );
-});
 /*--------------------------------------DELETEPROJECTS------------------------------------*/
 
 /*--------------------------------------DELETEFOLDER------------------------------------*/
@@ -709,8 +693,85 @@ app.post("/getfolder", (req, res) => {
 
 /*---------------------------GETFOLDER----------------------*/
 
-/*------------------------icon--------------------------------------*/
-/*------------------------icon--------------------------------------*/
+/*------------------------ICONUSER--------------------------------------*/
+app.post("/sendicon_user", (req, res) => {
+  const userId = req.body.id_usuario;
+  const IconID = req.body.icone;
+
+  db.query(
+    "UPDATE usuarios SET icon_user = ? WHERE id = ?",
+    [IconID, userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(404).send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      res.send({ msg: "Ícone inserido com sucesso" });
+    }
+  );
+});
+
+/*------------------------ICONUSER--------------------------------------*/
+
+/*------------------------ICONPROJECT--------------------------------------*/
+app.post("/sendicon_project", (req, res) => {
+  const IDproject = req.parbodyms.id;
+  const IconID = req.body.icone; 
+
+  db.query(
+    "UPDATE project SET icon_project = ? WHERE id = ?",
+    [IDproject, IconID],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(404).send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      res.send({ msg: "Ícone inserido com sucesso" });
+    }
+  );
+});
+
+/*------------------------ICONPROJECT--------------------------------------*/
+/*------------------------ICONTEAM--------------------------------------*/
+app.post("/sendicon_team", (req, res) => {
+  const IDproject = req.parbodyms.id;
+  const Teamicon = req.body.icone; 
+
+  db.query(
+    "UPDATE team SET team_icon = ? WHERE id = ?",
+    [Teamicon, IDproject],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(404).send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      res.send({ msg: "Ícone inserido com sucesso" });
+    }
+  );
+});
+
+/*------------------------ICONPROJECT--------------------------------------*/
+
+/*--------------------------------------------------------------*/
+/*--------------------------------------------------------------*/
 
 /*---------------------------FORGOT----------------------*/
 /*---------------------------FORGOT----------------------*/
@@ -718,3 +779,224 @@ app.post("/getfolder", (req, res) => {
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*  CABO. *-*   */

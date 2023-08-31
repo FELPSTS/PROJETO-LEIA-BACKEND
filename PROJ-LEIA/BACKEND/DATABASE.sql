@@ -5,7 +5,7 @@ CREATE TABLE usuarios (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(45) UNIQUE NOT NULL,
     email VARCHAR(45) NOT NULL,
-    icon_user blob,
+    icon_user BLOB,
     password VARCHAR(200) NOT NULL
 );
 SELECT * FROM usuarios; 
@@ -14,7 +14,7 @@ CREATE TABLE team(
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_usuarios INT,
     titulo TEXT NOT NULL,
-    team_icon blob,
+    team_icon BLOB,
     FOREIGN KEY (id_usuarios) REFERENCES usuarios (id)
 );
 SELECT * FROM team; 
@@ -46,7 +46,7 @@ CREATE TABLE docs (
     id_project INT,
     id_folder INT,
     collaboration TEXT,
-    titulo TEXT NOT NULL,
+    titulo TEXT NOT NULL ,
     content TEXT NOT NULL,
     preview VARCHAR(8000),
 	FOREIGN KEY	(id_project) REFERENCES project(id),
