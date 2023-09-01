@@ -86,6 +86,11 @@ app.post("/savedocs", (req, res) => {
   const content = req.body.content;
   const preview = req.body.preview;
 
+
+  if (!projectId || !titulo || !content) {
+    res.status(400).send({ erro: "Todos os campos devem ser preenchidos" });
+    return;}
+
   db.query(
     "SELECT * FROM docs WHERE id = ? AND id_project = ?",
     [docsId, projectId],
