@@ -721,12 +721,12 @@ app.post("/sendicon_user", (req, res) => {
 
 /*------------------------ICONPROJECT--------------------------------------*/
 app.post("/sendicon_project", (req, res) => {
-  const IDproject = req.parbodyms.id;
+  const projectID = req.parbodyms.id;
   const IconID = req.body.icone; 
 
   db.query(
     "UPDATE project SET icon_project = ? WHERE id = ?",
-    [IDproject, IconID],
+    [projectID, IconID],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -746,12 +746,12 @@ app.post("/sendicon_project", (req, res) => {
 /*------------------------ICONPROJECT--------------------------------------*/
 /*------------------------ICONTEAM--------------------------------------*/
 app.post("/sendicon_team", (req, res) => {
-  const IDproject = req.parbodyms.id;
+  const TeamID = req.body.id;
   const Teamicon = req.body.icone; 
 
   db.query(
     "UPDATE team SET team_icon = ? WHERE id = ?",
-    [Teamicon, IDproject],
+    [Teamicon, TeamID],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
