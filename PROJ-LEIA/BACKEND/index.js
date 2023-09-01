@@ -386,7 +386,7 @@ app.post("/createfolder", (req, res) => {
   const titulo = req.body.titulo;
 
   db.query(
-    "SELECT * FROM folder WHERE titulo = ? and id_project",
+    "SELECT * FROM folder WHERE titulo = ? and id_project= ?",
     [titulo, id_project],
     (err, result) => {
       if (err) {
