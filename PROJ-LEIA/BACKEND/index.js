@@ -696,8 +696,28 @@ app.post("/getfolder", (req, res) => {
   );
 });
 
-/*---------------------------GETFOLDER----------------------*/
+/*---------------------------GETFOLDERBYID----------------------*/
 
+
+/*---------------------------GETFOLDER----------------------*/ 
+ app.post("/getfolder", (req, res) => { 
+   const foldertId = req.body.id_folder; 
+  
+   db.query( 
+     "SELECT * FROM folder WHERE id= ?", 
+     [folderId], 
+     (err, result) => { 
+       if (err) { 
+         res.status(500).send(err); 
+         return; 
+       } 
+  
+       res.send(result); 
+     } 
+   ); 
+ }); 
+  
+ /*---------------------------GETFOLDER----------------------*/
 /*------------------------ICONUSER--------------------------------------*/
 app.post("/sendicon_user", (req, res) => {
   const userId = req.body.id_usuario;
