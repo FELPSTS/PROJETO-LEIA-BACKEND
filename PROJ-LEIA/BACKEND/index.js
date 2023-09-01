@@ -678,13 +678,13 @@ app.post("/getprojects", (req, res) => {
 /*---------------------------GETPROEJCTS----------------------*/
 
 
-/*---------------------------GETFOLDER----------------------*/
+/*---------------------------GETFOLDERBYID----------------------*/
 app.post("/getfolder", (req, res) => {
-  const folderId = req.body.id_folder;
+  const projectId = req.body.id_project;
 
   db.query(
-    "SELECT * FROM folder WHERE id= ?",
-    [folderId],
+    "SELECT * FROM folder WHERE id_project= ?",
+    [projectId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
