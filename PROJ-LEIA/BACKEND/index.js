@@ -712,7 +712,7 @@ app.post("/sendicon_user", (req, res) => {
         return;
       }
 
-      res.send({ msg: "Ícone inserido com sucesso" });
+      res.send({ msg: "Imagem inserida com sucesso" });
     }
   );
 });
@@ -738,7 +738,7 @@ app.post("/sendicon_project", (req, res) => {
         return;
       }
 
-      res.send({ msg: "Ícone inserido com sucesso" });
+      res.send({ msg: "Imagem inserida com sucesso" });
     }
   );
 });
@@ -763,7 +763,7 @@ app.post("/sendicon_team", (req, res) => {
         return;
       }
 
-      res.send({ msg: "Ícone inserido com sucesso" });
+      res.send({ msg: "Imagem inserida com sucesso" });
     }
   );
 });
