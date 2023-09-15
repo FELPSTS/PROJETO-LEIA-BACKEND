@@ -40,11 +40,11 @@ app.post("/register", (req, res) => {
             return;
           }
 
-          res.send({ msg: "Cadastrado com Ãªxito" });
+          res.send({ msg: "Cadastrado com ÃƒÂªxito" });
         }
       );
     } else {
-      res.status(141).send({ msg: "UsuÃ¡rio jÃ¡ estÃ¡ cadastrado" });
+      res.status(141).send({ msg: "UsuÃƒÂ¡rio jÃƒÂ¡ estÃƒÂ¡ cadastrado" });
     }
   });
 });
@@ -68,7 +68,7 @@ app.post("/login", (req, res) => {
       if (result.length > 0) {
         const user = result[0];
         const userid = user.id;
-        res.send({ /*msg: "UsuÃ¡rio logado com sucesso",*/ userId: userid });
+        res.send({ /*msg: "UsuÃƒÂ¡rio logado com sucesso",*/ userId: userid });
       } else {
         res.status(401).send({ msg: "Email ou senha incorretos" });
       }
@@ -86,10 +86,10 @@ app.post("/savedocs", (req, res) => {
   const content = req.body.content;
   const preview = req.body.preview;
 
-
   if (!projectId || !titulo || !content) {
     res.status(400).send({ erro: "Todos os campos devem ser preenchidos" });
-    return;}
+    return;
+  }
 
   db.query(
     "SELECT * FROM docs WHERE id = ? AND id_project = ?",
@@ -110,7 +110,7 @@ app.post("/savedocs", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
+            res.send({ msg: "Cadastrado com ÃƒÂªxito" });
           }
         );
       } else {
@@ -125,7 +125,7 @@ app.post("/savedocs", (req, res) => {
             }
 
             if (resultUpdate.affectedRows === 0) {
-              res.status(404).send({ msg: "Projeto nÃ£o encontrado" });
+              res.status(404).send({ msg: "Projeto nÃƒÂ£o encontrado" });
               return;
             }
 
@@ -159,7 +159,6 @@ app.post("/searchdocs", (req, res) => {
 });
 
 /*---------------------------SEARCHDOCS----------------------*/
-
 
 /*---------------------------SEARCHPROJECTS----------------------*/
 app.post("/searchproject", (req, res) => {
@@ -197,7 +196,7 @@ app.post("/alter", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        res.send({ msg: "UsuÃƒÂ¡rio nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -235,7 +234,7 @@ app.post("/alterproject", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        res.send({ msg: "UsuÃƒÂ¡rio nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -274,7 +273,7 @@ app.post("/alterfolder", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "FOLDER nÃ£o encontrado" });
+        res.send({ msg: "FOLDER nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -299,7 +298,6 @@ app.post("/alterfolder", (req, res) => {
 app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
-  
 
   db.query(
     "SELECT * FROM team WHERE titulo = ? AND id_usuario = ?",
@@ -320,7 +318,7 @@ app.post("/createteams", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
+            res.send({ msg: "Cadastrado com ÃƒÂªxito" });
           }
         );
       }
@@ -356,7 +354,7 @@ app.post("/sendproject", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
+            res.send({ msg: "Cadastrado com ÃƒÂªxito" });
           }
         );
       } else {
@@ -404,7 +402,7 @@ app.post("/createfolder", (req, res) => {
               return;
             }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
+            res.send({ msg: "Cadastrado com ÃƒÂªxito" });
           }
         );
       }
@@ -430,7 +428,7 @@ app.post("/UserDelete", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        res.send({ msg: "UsuÃƒÂ¡rio nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -444,9 +442,9 @@ app.post("/UserDelete", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(404).send({ msg: "Registro nÃ£o encontrado" });
+            res.status(404).send({ msg: "Registro nÃƒÂ£o encontrado" });
           } else {
-            res.send({ msg: "Registro deletado com Ãªxito" });
+            res.send({ msg: "Registro deletado com ÃƒÂªxito" });
           }
         }
       );
@@ -471,7 +469,7 @@ app.post("/deletecard", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        res.send({ msg: "UsuÃƒÂ¡rio nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -485,9 +483,9 @@ app.post("/deletecard", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Documento nÃ£o encontrado" });
+            res.status(500).send({ msg: "Documento nÃƒÂ£o encontrado" });
           } else {
-            res.send({ msg: "Documento deletado com Ãªxito" });
+            res.send({ msg: "Documento deletado com ÃƒÂªxito" });
           }
         }
       );
@@ -501,24 +499,23 @@ app.post("/deleteprojects", (req, res) => {
   const userId = req.body.id_usuario;
   const projectId = req.body.id_projects;
 
-      db.query(
-        "DELETE FROM project WHERE id_usuario = ? AND id = ?  ",
-        [userId, projectId],
-        (err, result) => {
-          if (err) {
-            res.status(500).send(err);
-            return;
-          }
+  db.query(
+    "DELETE FROM project WHERE id_usuario = ? AND id = ?  ",
+    [userId, projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
 
-          if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
-          } else {
-            res.send({ msg: "Projeto deletado com Ãªxito" });
-          }
-        }
-      );
+      if (result.affectedRows === 0) {
+        res.status(500).send({ msg: "Projeto nÃƒÂ£o encontrado" });
+      } else {
+        res.send({ msg: "Projeto deletado com ÃƒÂªxito" });
+      }
     }
   );
+});
 /*--------------------------------------DELETEPROJECTS------------------------------------*/
 
 /*--------------------------------------DELETEFOLDER------------------------------------*/
@@ -536,7 +533,7 @@ app.post("/deletefolder", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "folder nÃ£o encontrado" });
+        res.send({ msg: "folder nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -550,9 +547,9 @@ app.post("/deletefolder", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
+            res.status(500).send({ msg: "Projeto nÃƒÂ£o encontrado" });
           } else {
-            res.send({ msg: "Projeto deletado com Ãªxito" });
+            res.send({ msg: "Projeto deletado com ÃƒÂªxito" });
           }
         }
       );
@@ -576,7 +573,7 @@ app.post("/deleteteam", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        res.send({ msg: "UsuÃƒÂ¡rio nÃƒÂ£o encontrado" });
         return;
       }
 
@@ -590,9 +587,9 @@ app.post("/deleteteam", (req, res) => {
           }
 
           if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
+            res.status(500).send({ msg: "Projeto nÃƒÂ£o encontrado" });
           } else {
-            res.send({ msg: "Projeto deletado com Ãªxito" });
+            res.send({ msg: "Projeto deletado com ÃƒÂªxito" });
           }
         }
       );
@@ -612,7 +609,7 @@ app.post("/getuser", (req, res) => {
     }
 
     if (result.length === 0) {
-      res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+      res.send({ msg: "UsuÃƒÂ¡rio nÃƒÂ£o encontrado" });
       return;
     }
     res.send(result);
@@ -637,12 +634,32 @@ app.post("/getdocumentbyid", (req, res) => {
 
 /*---------------------------GETDOCSBYID-------------------*/
 
+/*---------------------------GETDOCSBYFOLDERID-------------------*/
+app.post("/getdocumentbyfolderid", (req, res) => {
+  const folderId = req.body.folderId;
+
+  db.query(
+    "SELECT * FROM docs WHERE id_folder = ?",
+    [folderId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETDOCSBYFOLDERID-------------------*/
+
 /*---------------------------GETDOCS----------------------*/
 app.post("/getdocs", (req, res) => {
   const projectId = req.body.id_project;
 
   db.query(
-    "SELECT * FROM docs WHERE id_project = ?",
+    "SELECT * FROM docs WHERE id_project = ? AND id_folder is null",
     [projectId],
     (err, result) => {
       if (err) {
@@ -677,9 +694,8 @@ app.post("/getprojects", (req, res) => {
 
 /*---------------------------GETPROEJCTS----------------------*/
 
-
 /*---------------------------GETFOLDERBYID----------------------*/
-app.post("/getfolder", (req, res) => {
+app.post("/getfolders", (req, res) => {
   const projectId = req.body.id_project;
 
   db.query(
@@ -698,26 +714,6 @@ app.post("/getfolder", (req, res) => {
 
 /*---------------------------GETFOLDERBYID----------------------*/
 
-
-/*---------------------------GETFOLDER----------------------*/ 
- app.post("/getfolder", (req, res) => { 
-   const foldertId = req.body.id_folder; 
-  
-   db.query( 
-     "SELECT * FROM folder WHERE id= ?", 
-     [folderId], 
-     (err, result) => { 
-       if (err) { 
-         res.status(500).send(err); 
-         return; 
-       } 
-  
-       res.send(result); 
-     } 
-   ); 
- }); 
-  
- /*---------------------------GETFOLDER----------------------*/
 /*------------------------ICONUSER--------------------------------------*/
 app.post("/sendicon_user", (req, res) => {
   const userId = req.body.id_usuario;
@@ -733,7 +729,7 @@ app.post("/sendicon_user", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "Usuário não encontrado" });
+        res.status(404).send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -747,7 +743,7 @@ app.post("/sendicon_user", (req, res) => {
 /*------------------------ICONPROJECT--------------------------------------*/
 app.post("/sendicon_project", (req, res) => {
   const projectID = req.parbodyms.id;
-  const IconID = req.body.icone; 
+  const IconID = req.body.icone;
 
   db.query(
     "UPDATE project SET icon_project = ? WHERE id = ?",
@@ -759,7 +755,7 @@ app.post("/sendicon_project", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "Usuário não encontrado" });
+        res.status(404).send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -772,7 +768,7 @@ app.post("/sendicon_project", (req, res) => {
 /*------------------------ICONTEAM--------------------------------------*/
 app.post("/sendicon_team", (req, res) => {
   const TeamID = req.body.id;
-  const Teamicon = req.body.icone; 
+  const Teamicon = req.body.icone;
 
   db.query(
     "UPDATE team SET team_icon = ? WHERE id = ?",
@@ -784,7 +780,7 @@ app.post("/sendicon_team", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "Usuário não encontrado" });
+        res.status(404).send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
@@ -804,224 +800,5 @@ app.post("/sendicon_team", (req, res) => {
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*  CABO. *-*   */
