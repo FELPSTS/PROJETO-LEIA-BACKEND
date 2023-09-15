@@ -87,7 +87,7 @@ app.post("/savedocs", (req, res) => {
   const preview = req.body.preview;
 
   if (!projectId || !titulo || !content) {
-    res.status(400).send({ erro: "Todos os campos devem ser preenchidos" });
+    res.status(400).send({ erro: "Omnes agros impleri" });
     return;
   }
 
@@ -224,6 +224,8 @@ app.post("/alterproject", (req, res) => {
   const titulo = req.body.titulo;
   const descricao = req.body.descricao;
 
+
+  
   db.query(
     "SELECT * FROM project WHERE id_usuario = ? AND id = ?",
     [userId, projectId],
@@ -299,6 +301,11 @@ app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
 
+  if (!userId || !titulo ) {
+    res.status(400).send({ erro: "Omnes agros impleri" });
+    return;
+    }
+  
   db.query(
     "SELECT * FROM team WHERE titulo = ? AND id_usuario = ?",
     [titulo, userId],
@@ -335,6 +342,11 @@ app.post("/sendproject", (req, res) => {
   const titulo = req.body.titulo;
   const descricao = req.body.descricao;
 
+  if (!team_id || !titulo ) {
+    res.status(400).send({ erro: "Omnes agros impleri" });
+    return;
+  }
+  
   db.query(
     "SELECT * FROM project WHERE titulo = ? AND id_usuario = ? ",
     [titulo, userId],
@@ -383,6 +395,12 @@ app.post("/createfolder", (req, res) => {
   const id_project = req.body.id_project;
   const titulo = req.body.titulo;
 
+    if (!id_project || !titulo ) {
+    res.status(400).send({ erro: "Omnes agros impleri" });
+    return;
+    }
+  
+  
   db.query(
     "SELECT * FROM folder WHERE titulo = ? and id_project= ?",
     [titulo, id_project],
