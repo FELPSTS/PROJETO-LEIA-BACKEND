@@ -49,6 +49,7 @@ CREATE TABLE docs (
     titulo TEXT NOT NULL ,
     content TEXT NOT NULL,
     preview VARCHAR(8000),
+    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY	(id_project) REFERENCES project(id),
     FOREIGN KEY (id_folder)  REFERENCES folder(id)
 );
