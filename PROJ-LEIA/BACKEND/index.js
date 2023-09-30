@@ -728,6 +728,25 @@ app.post("/getfolders", (req, res) => {
 });
 
 /*---------------------------GETFOLDERBYID----------------------*/
+/*--------------------------GETIME------------------------------*/
+app.post("/GetTime", (req, res) => {
+  const id_docs = req.body.id_docs;
+  const timemodified = req.body.timemodified;
+
+  db.query(
+    "SELECT * FROM docs WHERE last_modified = ?",
+    [timemodified],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+/*--------------------------GETIME------------------------------*/
 
 /*---------------------------ADDDOCINTOFOLDER----------------------*/
 app.post("/addtofolder", (req, res) => {
@@ -827,8 +846,29 @@ app.post("/sendicon_team", (req, res) => {
 
 /*------------------------ICONPROJECT--------------------------------------*/
 
-/*--------------------------------------------------------------*/
-/*--------------------------------------------------------------*/
+/*-----------------------------COMPARETIME---------------------------------*/
+app.post("/compare_time", (req, res) => {
+  const time = req.body.time;
+  const last_modified = req.body.modified;
+
+  if (last_modified > time) {
+    db.query(
+      "SELECT * FROM docs WHERE last_modified > ? ORDER BY last_modified DESC LIMIT 3",
+      [time],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
+
+        res.send(result);
+      }
+    );
+  } else {
+    res.status(400).send({ msg: "O tempo especificado não é mais recente que last_modified." });
+  }
+});
+/*-------------------------------COMPARETIME-------------------------------*/
 
 /*---------------------------FORGOT----------------------*/
 /*---------------------------FORGOT----------------------*/
