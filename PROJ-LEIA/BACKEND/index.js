@@ -734,7 +734,7 @@ app.post("/getcompare_time", (req, res) => {
   
     db.query(
       "SELECT * FROM docs WHERE id = ? ORDER BY last_modified DESC LIMIT 3  ",
-      [last_modified,id],
+      [id,last_modified],
       (err, result) => {
         if (err) {
           res.status(500).send(err);
