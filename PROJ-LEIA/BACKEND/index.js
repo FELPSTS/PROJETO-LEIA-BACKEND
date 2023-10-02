@@ -730,11 +730,11 @@ app.post("/getfolders", (req, res) => {
 /*---------------------------GETFOLDERBYID----------------------*/
 /*-----------------------------GETCOMPARETIME---------------------------------*/
 app.post("/getcompare_time", (req, res) => {
-  const id = req.body.modified; 
+  const id = req.body.id; 
   
     db.query(
       "SELECT * FROM docs WHERE id = ? ORDER BY last_modified DESC LIMIT 3  ",
-      [id,last_modified],
+      [id],
       (err, result) => {
         if (err) {
           res.status(500).send(err);
