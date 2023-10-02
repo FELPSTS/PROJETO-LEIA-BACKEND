@@ -298,15 +298,16 @@ app.post("/alterfolder", (req, res) => {
 app.post("/createteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
+  const content = req.body.content;
 
-  if (!userId || !titulo ) {
-    res.status(400).send({ erro: "Omnes agros impleri" });
+  if (!userId || !titulo) {
+    res.status(400).send({ erro: "כל השדות הם חובה" });
     return;
-    }
+  }
 
   db.query(
-    "SELECT * FROM team WHERE titulo = ? AND id_usuario = ?",
-    [titulo, userId],
+    "SELECT * FROM team WHERE titulo = ? content = ? AND id_usuario = ?",
+    [titulo,content ,userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -315,22 +316,40 @@ app.post("/createteams", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO project (id_usuario, titulo) VALUES ( ?, ?)",
-          [userId, titulo],
+          "INSERT INTO team (id_usuario, content,titulo) VALUES (?, ?,?)",
+          [userId,content,titulo],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
               return;
             }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
+            res.status(201).send({ msg: "Feliciter creatus doloro" });
+          }
+        );
+      } else {
+
+        db.query(
+          "UPDATE team SET titulo = ?, content = ? WHERE id = ?",
+          [titulo, content, teamId],
+          (err, resultUpdate) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            if (resultUpdate.affectedRows === 0) {
+              res.status(404).send({ msg: "Bigas non inveni" });
+              return;
+            }
+
+            res.send({ msg: "Equipe atualizada com sucesso" });
           }
         );
       }
     }
   );
 });
-
 /*---------------------------------SENDTEAMS------------------------------*/
 
 /*---------------------------------SENDPROJECT------------------------------*/
