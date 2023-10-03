@@ -974,7 +974,7 @@ app.post("/adduserintoteam", (req, res) => {
     }
   );
 });
-/*---------------------------ADDDOCINTOFOLDER----------------------*/
+/*---------------------------ADDDOCINTOTEAM----------------------*/
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
