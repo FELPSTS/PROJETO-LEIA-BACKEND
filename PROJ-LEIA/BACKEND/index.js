@@ -785,27 +785,6 @@ app.post("/getcompare_time", (req, res) => {
 });
 /*-------------------------------GETCOMPARETIME-------------------------------*/
 
-/*---------------------------ADDDOCINTOFOLDER----------------------*/
-app.post("/addtofolder", (req, res) => {
-  const folderId = req.body.folderId;
-  const documentId = req.body.documentId;
-
-  db.query(
-    "UPDATE docs SET id_folder = ? WHERE id = ?",
-    [folderId, documentId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      res.send(result);
-    }
-  );
-});
-
-/*---------------------------ADDDOCINTOFOLDER----------------------*/
-
 /*---------------------------GETTEAMBYID----------------------*/
 app.post("/getteam", (req, res) => {
   const id_usuario = req.body.id_usuario;
@@ -825,6 +804,26 @@ app.post("/getteam", (req, res) => {
 });
 
 /*---------------------------GETTEAMBYID----------------------*/
+
+/*---------------------------GETTEAMUSERBYID----------------------*/
+app.post("/getteamuser", (req, res) => {
+  const idteam = req.body.team;
+
+  db.query(
+    "SELECT * FROM team_usuario WHERE idteam= ?",
+    [idteam],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETTEAMUSERBYID----------------------*/
 
 /*------------------------ICONUSER--------------------------------------*/
 app.post("/sendicon_user", (req, res) => {
@@ -867,7 +866,7 @@ app.post("/sendicon_project", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "Usuário não encontrado" });
+        res.status(404).send({ msg: "project não encontrado" });
         return;
       }
 
@@ -892,7 +891,7 @@ app.post("/sendicon_team", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "Usuário não encontrado" });
+        res.status(404).send({ msg: "team não encontrado" });
         return;
       }
 
@@ -903,11 +902,79 @@ app.post("/sendicon_team", (req, res) => {
 
 /*------------------------ICONPROJECT--------------------------------------*/
 
+/*---------------------------ADDDOCINTOFOLDER----------------------*/
+app.post("/addtofolder", (req, res) => {
+  const folderId = req.body.folderId;
+  const documentId = req.body.documentId;
 
+  db.query(
+    "UPDATE docs SET id_folder = ? WHERE id = ?",
+    [folderId, documentId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
 
-/*---------------------------FORGOT----------------------*/
-/*---------------------------FORGOT----------------------*/
+      res.send(result);
+    }
+  );
+});
 
+/*---------------------------ADDDOCINTOFOLDER----------------------*/
+
+/*---------------------------ADDDOCINTOTEAM----------------------*/
+app.post("/adduserintoteam", (req, res) => {
+  const teamuserId = req.body.teamuserId;
+  const teamId = req.body.teamId;
+  const id_usuarioId = req.body.id_usuario;
+
+ db.query(
+    "SELECT * FROM team_usuario WHERE id_time = ?",
+    [docsId, projectId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO team_usuario (teamId, id_usuarioId) VALUES ( ?, ?)",
+          [teamId, id_usuarioId],
+          (err, resultInsert) => {
+            if (err) {
+              res.status(200).send(err);
+              return;
+            }
+
+            res.send({ msg: "Cadastrado com Ãªxito" });
+          }
+        );
+      } else {
+        db.query(
+          "UPDATE team_usuario SET id_usuarioId = ? WHERE id = ?",
+          [id_usuarioId,teamuserId],
+          (err, resultUpdate) => {
+            if (err) {
+              res.status(201).send(err);
+              return;
+              cd;
+            }
+
+            if (resultUpdate.affectedRows === 0) {
+              res.status(404).send({ msg: "team nÃ£o encontrado" });
+              return;
+            }
+
+            res.send({ msg: "team atualizado com sucesso" });
+          }
+        );
+      }
+    }
+  );
+});
+/*---------------------------ADDDOCINTOFOLDER----------------------*/
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
