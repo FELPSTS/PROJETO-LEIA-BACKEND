@@ -825,83 +825,6 @@ app.post("/getteamuser", (req, res) => {
 
 /*---------------------------GETTEAMUSERBYID----------------------*/
 
-/*------------------------ICONUSER--------------------------------------*/
-app.post("/sendicon_user", (req, res) => {
-  const userId = req.body.id_usuario;
-  const IconID = req.body.icone;
-
-  db.query(
-    "UPDATE usuarios SET icon_user = ? WHERE id = ?",
-    [IconID, userId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "Usuário não encontrado" });
-        return;
-      }
-
-      res.send({ msg: "Imagem inserida com sucesso" });
-    }
-  );
-});
-
-/*------------------------ICONUSER--------------------------------------*/
-
-/*------------------------ICONPROJECT--------------------------------------*/
-app.post("/sendicon_project", (req, res) => {
-  const projectID = req.parbodyms.id;
-  const IconID = req.body.icone;
-
-  db.query(
-    "UPDATE project SET icon_project = ? WHERE id = ?",
-    [projectID, IconID],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "project não encontrado" });
-        return;
-      }
-
-      res.send({ msg: "Imagem inserida com sucesso" });
-    }
-  );
-});
-
-/*------------------------ICONPROJECT--------------------------------------*/
-/*------------------------ICONTEAM--------------------------------------*/
-app.post("/sendicon_team", (req, res) => {
-  const TeamID = req.body.id;
-  const Teamicon = req.body.icone;
-
-  db.query(
-    "UPDATE team SET team_icon = ? WHERE id = ?",
-    [Teamicon, TeamID],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "team não encontrado" });
-        return;
-      }
-
-      res.send({ msg: "Imagem inserida com sucesso" });
-    }
-  );
-});
-
-/*------------------------ICONPROJECT--------------------------------------*/
-
 /*---------------------------ADDDOCINTOFOLDER----------------------*/
 app.post("/addtofolder", (req, res) => {
   const folderId = req.body.folderId;
@@ -975,6 +898,64 @@ app.post("/adduserintoteam", (req, res) => {
   );
 });
 /*---------------------------ADDDOCINTOTEAM----------------------*/
+
+/*------------------------ICONUSER--------------------------------------*/
+app.post("/sendicon_user", (req, res) => {
+  const userId = req.body.id_usuario;
+  const IconID = req.body.icone;
+
+  db.query(
+    "UPDATE usuarios SET icon_user = ? WHERE id = ?",
+    [IconID, userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(404).send({ msg: "Usuário não encontrado" });
+        return;
+      }
+
+      res.send({ msg: "Imagem inserida com sucesso" });
+    }
+  );
+});
+
+/*------------------------ICONUSER--------------------------------------*/
+
+/*------------------------ICONPROJECT--------------------------------------*/
+app.post("/sendicon_project", (req, res) => {
+  const projectID = req.parbodyms.id;
+  const IconID = req.body.icone;
+
+  db.query(
+    "UPDATE project SET icon_project = ? WHERE id = ?",
+    [projectID, IconID],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(404).send({ msg: "project não encontrado" });
+        return;
+      }
+
+      res.send({ msg: "Imagem inserida com sucesso" });
+    }
+  );
+});
+
+/*------------------------ICONPROJECT--------------------------------------*/
+/*------------------------ICONTEAM--------------------------------------*/
+app.post("/sendicon_team", (req, res) => {
+  const TeamID = req.body.id;
+  const Teamicon = req.body.icone;
+
+  db.query(
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
