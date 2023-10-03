@@ -12,12 +12,23 @@ SELECT * FROM usuarios;
 
 CREATE TABLE team(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    id_usuarios INT,
+    id_usuario INT,
     titulo TEXT NOT NULL,
+    content TEXT NOT NULL,
     team_icon BLOB,
     FOREIGN KEY (id_usuarios) REFERENCES usuarios (id)
 );
 SELECT * FROM team; 
+
+CREATE TABLE team_usuario(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_time INT,
+    id_usuario INT,
+    FOREIGN KEY (id_time) REFERENCES team (id),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
+);
+SELECT * FROM team_usuario; 
+
 
 CREATE TABLE project (
     id INT PRIMARY KEY AUTO_INCREMENT,
