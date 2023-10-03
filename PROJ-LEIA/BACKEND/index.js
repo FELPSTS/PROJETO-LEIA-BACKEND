@@ -747,6 +747,25 @@ app.post("/getfolders", (req, res) => {
 });
 
 /*---------------------------GETFOLDERBYID----------------------*/
+/*---------------------------GETTEAMBYID----------------------*/
+app.post("/getteam", (req, res) => {
+  const id_usuario = req.body.id_usuario;
+
+  db.query(
+    "SELECT * FROM team WHERE id_usuario= ?",
+    [id_usuario],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETTEAMBYID----------------------*/
 /*-----------------------------GETCOMPARETIME---------------------------------*/
 app.post("/getcompare_time", (req, res) => {
   const id = req.body.id; 
@@ -786,6 +805,26 @@ app.post("/addtofolder", (req, res) => {
 });
 
 /*---------------------------ADDDOCINTOFOLDER----------------------*/
+
+/*---------------------------GETTEAMBYID----------------------*/
+app.post("/getteam", (req, res) => {
+  const id_usuario = req.body.id_usuario;
+
+  db.query(
+    "SELECT * FROM team WHERE id_usuario= ?",
+    [id_usuario],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETTEAMBYID----------------------*/
 
 /*------------------------ICONUSER--------------------------------------*/
 app.post("/sendicon_user", (req, res) => {
