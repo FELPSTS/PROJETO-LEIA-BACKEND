@@ -951,13 +951,28 @@ app.post("/sendicon_project", (req, res) => {
 
 /*------------------------ICONPROJECT--------------------------------------*/
 /*------------------------ICONTEAM--------------------------------------*/
-app.post("/sendicon_team", (req, res) => {
-  const TeamID = req.body.id;
-  const Teamicon = req.body.icone;
+app.post("/sendicon_project", (req, res) => {
+  const TeamID = req.parbodyms.teamid;
+  const IconID = req.body.icone;
 
   db.query(
-app.listen(3001, () => {
-  console.log("Rodando na porta 3001");
+    "UPDATE team SET icon_project = ? WHERE id = ?",w
+    [IconID, TeamID],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(404).send({ msg: "project não encontrado" });
+        return;
+      }
+
+      res.send({ msg: "Imagem inserida com sucesso" });
+    }
+  );
 });
 
+/*------------------------ICONPROJECT--------------------------------------*/
 /*  CABO. *-*   */
