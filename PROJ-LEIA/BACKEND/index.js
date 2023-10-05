@@ -85,6 +85,7 @@ app.post("/savedocs", (req, res) => {
   const titulo = req.body.titulo;
   const content = req.body.content;
   const preview = req.body.preview;
+  const folderId = req.body.folderId;
 
   if (!projectId || !titulo || !content) {
     res.status(400).send({ erro: "Todos os campos devem ser preenchidos" });
@@ -101,18 +102,33 @@ app.post("/savedocs", (req, res) => {
       }
 
       if (result.length === 0) {
-        db.query(
-          "INSERT INTO docs (id_project, titulo, content, preview) VALUES ( ?, ?, ?, ?)",
-          [projectId, titulo, content, preview],
-          (err, resultInsert) => {
-            if (err) {
-              res.status(200).send(err);
-              return;
-            }
+        if (folderId) {
+          db.query(
+            "INSERT INTO docs (id_project, titulo, content, preview, id_folder) VALUES ( ?, ?, ?, ?, ?)",
+            [projectId, titulo, content, preview, folderId],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(200).send(err);
+                return;
+              }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
-          }
-        );
+              res.send({ msg: "Cadastrado com Ãªxito" });
+            }
+          );
+        } else {
+          db.query(
+            "INSERT INTO docs (id_project, titulo, content, preview) VALUES ( ?, ?, ?, ?)",
+            [projectId, titulo, content, preview],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(200).send(err);
+                return;
+              }
+
+              res.send({ msg: "Cadastrado com Ãªxito" });
+            }
+          );
+        }
       } else {
         db.query(
           "UPDATE docs SET titulo = ?, content = ?, preview = ? WHERE id = ?",
@@ -139,26 +155,42 @@ app.post("/savedocs", (req, res) => {
 
 /*--------------------------SAVEDOCS----------------*/
 
-/*---------------------------SEARCHDOCS----------------------*/
+/*---------------------------SEACHALLDOCS----------------------*/
 app.post("/searchdocs", (req, res) => {
   const projectId = req.body.id_project;
   const titulo = req.body.titulo;
+  const folderId = req.body.folderId;
 
-  db.query(
-    "SELECT * FROM docs WHERE titulo LIKE CONCAT('%', ?, '%') AND id_project = ?",
-    [titulo, projectId],
-    (err, result) => {
-      if (err) {
-        res.status(510).send(err);
-        return;
+  if (folderId) {
+    db.query(
+      "SELECT * FROM docs WHERE titulo LIKE CONCAT('%', ?, '%') AND id_folder = ?",
+      [titulo, projectId, folderId],
+      (err, result) => {
+        if (err) {
+          res.status(510).send(err);
+          return;
+        }
+
+        res.send(result);
       }
+    );
+  } else {
+    db.query(
+      "SELECT * FROM docs WHERE titulo LIKE CONCAT('%', ?, '%') AND id_project = ?",
+      [titulo, projectId],
+      (err, result) => {
+        if (err) {
+          res.status(510).send(err);
+          return;
+        }
 
-      res.send(result);
-    }
-  );
+        res.send(result);
+      }
+    );
+  }
 });
 
-/*---------------------------SEARCHDOCS----------------------*/
+/*---------------------------SEACHALLDOCS----------------------*/
 
 /*---------------------------SEARCHPROJECTS----------------------*/
 app.post("/searchproject", (req, res) => {
@@ -180,6 +212,47 @@ app.post("/searchproject", (req, res) => {
   );
 });
 /*---------------------------SEARCHPROJECTS----------------------*/
+
+/*---------------------------SEARCHFOLDER----------------------*/
+app.post("/searchproject", (req, res) => {
+  const userId = req.body.user_id;
+  const titulo = req.body.titulo;
+
+  db.query(
+    "SELECT * FROM folder WHERE titulo LIKE CONCAT('%', ?, '%') AND id_usuario = ?",
+    [titulo, userId],
+    (err, result) => {
+      if (err) {
+        res.status(510).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+/*---------------------------SEARCHFOLDER----------------------*/
+
+/*---------------------------SEARCHTEAM----------------------*/
+app.post("/searchproject", (req, res) => {
+  const userId = req.body.user_id;
+  const titulo = req.body.titulo;
+
+  db.query(
+    "SELECT * FROM team WHERE titulo LIKE CONCAT('%', ?, '%') AND id_usuario = ?",
+    [titulo, userId],
+    (err, result) => {
+      if (err) {
+        res.status(510).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+/*---------------------------SEARCHTEAM----------------------*/
+
 /*------------------------------ALTERLOGIN==--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
@@ -217,6 +290,7 @@ app.post("/alter", (req, res) => {
 });
 
 /*------------------------------ALTERLOGIN--------------------------*/
+
 /*------------------------------ALTERPROJECT--------------------------*/
 app.post("/alterproject", (req, res) => {
   const userId = req.body.id_usuario;
@@ -294,20 +368,20 @@ app.post("/alterfolder", (req, res) => {
 });
 
 /*------------------------------ALTERFOLDER--------------------------*/
+
 /*---------------------------------SENDTEAMS------------------------------*/
-app.post("/createteams", (req, res) => {
+app.post("/saveteams", (req, res) => {
   const userId = req.body.id_usuario;
   const titulo = req.body.titulo;
-  const content = req.body.content;
 
   if (!userId || !titulo) {
-    res.status(400).send({ erro: "כל השדות הם חובה" });
+    res.status(400).send({ erro: "Usuário e(ou) título não encontrado " });
     return;
   }
 
   db.query(
-    "SELECT * FROM team WHERE titulo = ? content = ? AND id_usuario = ?",
-    [titulo,content ,userId],
+    "SELECT * FROM team WHERE titulo = ? AND id_usuarios = ?",
+    [titulo, userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -316,22 +390,25 @@ app.post("/createteams", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO team (id_usuario, content,titulo) VALUES (?, ?,?)",
-          [userId,content,titulo],
+          "INSERT INTO team (id_usuarios, titulo) VALUES (?, ?)",
+          [userId, titulo],
           (err, resultInsert) => {
             if (err) {
               res.status(500).send(err);
               return;
             }
 
-            res.status(201).send({ msg: "Feliciter creatus doloro" });
+            res.status(201).send({ msg: "Time criado com sucesso" });
           }
         );
       } else {
+        const content = req.body.content;
+        const preview = req.body.preview;
+        const docsId = req.body.docsId;
 
         db.query(
           "UPDATE team SET titulo = ?, content = ? WHERE id = ?",
-          [titulo, content, teamId],
+          [titulo, content, docsId],
           (err, resultUpdate) => {
             if (err) {
               res.status(500).send(err);
@@ -350,6 +427,7 @@ app.post("/createteams", (req, res) => {
     }
   );
 });
+
 /*---------------------------------SENDTEAMS------------------------------*/
 
 /*---------------------------------SENDPROJECT------------------------------*/
@@ -358,8 +436,9 @@ app.post("/sendproject", (req, res) => {
   const projectId = req.body.projectId;
   const titulo = req.body.titulo;
   const descricao = req.body.descricao;
+  const team_id = 1;
 
-	if (!team_id || !titulo ) {
+  if (!team_id || !titulo) {
     res.status(400).send({ erro: "Omnes agros impleri" });
     return;
   }
@@ -728,7 +807,7 @@ app.post("/getprojects", (req, res) => {
 
 /*---------------------------GETPROEJCTS----------------------*/
 
-/*---------------------------GETFOLDERBYID----------------------*/
+/*---------------------------GETFOLDERBYPROJECTID----------------------*/
 app.post("/getfolders", (req, res) => {
   const projectId = req.body.id_project;
 
@@ -746,14 +825,15 @@ app.post("/getfolders", (req, res) => {
   );
 });
 
+/*---------------------------GETFOLDERBYPROJECTID----------------------*/
+
 /*---------------------------GETFOLDERBYID----------------------*/
-/*---------------------------GETTEAMBYID----------------------*/
-app.post("/getteam", (req, res) => {
-  const id_usuario = req.body.id_usuario;
+app.post("/getfolderbyid", (req, res) => {
+  const folderId = req.body.folderId;
 
   db.query(
-    "SELECT * FROM team WHERE id_usuario= ?",
-    [id_usuario],
+    "SELECT titulo FROM folder WHERE id = ?",
+    [folderId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -765,25 +845,7 @@ app.post("/getteam", (req, res) => {
   );
 });
 
-/*---------------------------GETTEAMBYID----------------------*/
-/*-----------------------------GETCOMPARETIME---------------------------------*/
-app.post("/getcompare_time", (req, res) => {
-  const id = req.body.id; 
-  
-    db.query(
-      "SELECT * FROM docs WHERE id = ? ORDER BY last_modified DESC LIMIT 3  ",
-      [id],
-      (err, result) => {
-        if (err) {
-          res.status(500).send(err);
-          return;
-        }
-
-        res.send(result);
-      }
-    );
-});
-/*-------------------------------GETCOMPARETIME-------------------------------*/
+/*---------------------------GETFOLDERBYID----------------------*/
 
 /*---------------------------GETTEAMBYID----------------------*/
 app.post("/getteam", (req, res) => {
@@ -825,6 +887,25 @@ app.post("/getteamuser", (req, res) => {
 
 /*---------------------------GETTEAMUSERBYID----------------------*/
 
+/*-----------------------------GETCOMPARETIME---------------------------------*/
+app.post("/getcompare_time", (req, res) => {
+  const id = req.body.folderId;
+
+  db.query(
+    "SELECT * FROM docs WHERE id_folder = ? ORDER BY last_modified DESC LIMIT 3  ",
+    [id],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+/*-------------------------------GETCOMPARETIME-------------------------------*/
+
 /*---------------------------ADDDOCINTOFOLDER----------------------*/
 app.post("/addtofolder", (req, res) => {
   const folderId = req.body.folderId;
@@ -846,13 +927,33 @@ app.post("/addtofolder", (req, res) => {
 
 /*---------------------------ADDDOCINTOFOLDER----------------------*/
 
+/*---------------------------REMOVEDOCFROMFOLDER----------------------*/
+app.post("/removefromfolder", (req, res) => {
+  const documentId = req.body.documentId;
+
+  db.query(
+    "UPDATE docs SET id_folder = null WHERE id = ?",
+    [documentId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------REMOVEDOCFROMFOLDER----------------------*/
+
 /*---------------------------ADDDOCINTOTEAM----------------------*/
 app.post("/adduserintoteam", (req, res) => {
   const teamuserId = req.body.teamuserId;
   const teamId = req.body.teamId;
   const id_usuarioId = req.body.id_usuario;
 
- db.query(
+  db.query(
     "SELECT * FROM team_usuario WHERE id_time = ?",
     [docsId, projectId],
     (err, result) => {
@@ -877,12 +978,11 @@ app.post("/adduserintoteam", (req, res) => {
       } else {
         db.query(
           "UPDATE team_usuario SET id_usuarioId = ? WHERE id = ?",
-          [id_usuarioId,teamuserId],
+          [id_usuarioId, teamuserId],
           (err, resultUpdate) => {
             if (err) {
               res.status(201).send(err);
               return;
-              cd;
             }
 
             if (resultUpdate.affectedRows === 0) {
@@ -940,7 +1040,7 @@ app.post("/sendicon_project", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "project não encontrado" });
+        res.status(404).send({ msg: "Usuário não encontrado" });
         return;
       }
 
@@ -950,14 +1050,15 @@ app.post("/sendicon_project", (req, res) => {
 });
 
 /*------------------------ICONPROJECT--------------------------------------*/
+
 /*------------------------ICONTEAM--------------------------------------*/
-app.post("/sendicon_project", (req, res) => {
-  const TeamID = req.parbodyms.teamid;
-  const IconID = req.body.icone;
+app.post("/sendicon_team", (req, res) => {
+  const TeamID = req.body.id;
+  const Teamicon = req.body.icone;
 
   db.query(
-    "UPDATE team SET icon_project = ? WHERE id = ?",w
-    [IconID, TeamID],
+    "UPDATE team SET team_icon = ? WHERE id = ?",
+    [Teamicon, TeamID],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -965,7 +1066,7 @@ app.post("/sendicon_project", (req, res) => {
       }
 
       if (result.affectedRows === 0) {
-        res.status(404).send({ msg: "project não encontrado" });
+        res.status(404).send({ msg: "Usuário não encontrado" });
         return;
       }
 
@@ -975,4 +1076,9 @@ app.post("/sendicon_project", (req, res) => {
 });
 
 /*------------------------ICONTEAM--------------------------------------*/
+
+app.listen(3001, () => {
+  console.log("Rodando na porta 3001");
+});
+
 /*  CABO. *-*   */
