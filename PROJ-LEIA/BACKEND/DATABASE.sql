@@ -29,6 +29,15 @@ CREATE TABLE teams(
 );
 SELECT * FROM teams; 
 
+CREATE TABLE convites(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_time INT,
+    id_usuario INT,
+    FOREIGN KEY (id_time) REFERENCES team (id),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
+);
+SELECT * FROM teams; 
+
 
 CREATE TABLE project (
     id INT PRIMARY KEY AUTO_INCREMENT,
