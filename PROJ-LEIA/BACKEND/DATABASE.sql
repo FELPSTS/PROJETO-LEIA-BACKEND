@@ -27,7 +27,7 @@ CREATE TABLE teams(
     FOREIGN KEY (id_time) REFERENCES team (id),
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
 );
-SELECT * FROM team_usuario; 
+SELECT * FROM teams; 
 
 
 CREATE TABLE project (
