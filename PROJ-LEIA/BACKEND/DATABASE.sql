@@ -20,7 +20,7 @@ CREATE TABLE team(
 );
 SELECT * FROM team; 
 
-CREATE TABLE team_usuario(
+CREATE TABLE teams(
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_time INT,
     id_usuario INT,
