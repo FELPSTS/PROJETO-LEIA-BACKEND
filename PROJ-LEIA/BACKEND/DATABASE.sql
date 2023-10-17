@@ -36,7 +36,7 @@ CREATE TABLE invitation(
     id_remetente INT,			
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     aceito BOOLEAN DEFAULT FALSE,	
-    FOREIGN KEY (id_time) REFERENCES team (id),
+    FOREIGN KEY (id_time) REFERENCES teams (id),
     FOREIGN KEY (id_destinatário) REFERENCES usuarios (id),
     FOREIGN KEY (id_remetente) REFERENCES usuarios (id)
 );
