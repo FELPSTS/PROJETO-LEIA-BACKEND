@@ -29,15 +29,18 @@ CREATE TABLE teams(
 );
 SELECT * FROM teams; 
 
-CREATE TABLE convites(
+CREATE TABLE invitation(
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_time INT,
-    id_usuario INT,
+    id_destinatário INT,
+    id_remetente INT,			
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    aceito BOOLEAN DEFAULT FALSE,	
     FOREIGN KEY (id_time) REFERENCES team (id),
-    FOREIGN KEY (id_usuario) REFERENCES usuarios (id)
+    FOREIGN KEY (id_destinatário) REFERENCES usuarios (id),
+    FOREIGN KEY (id_remetente) REFERENCES usuarios (id)
 );
-SELECT * FROM teams; 
-
+SELECT * FROM invitation; 
 
 CREATE TABLE project (
     id INT PRIMARY KEY AUTO_INCREMENT,
