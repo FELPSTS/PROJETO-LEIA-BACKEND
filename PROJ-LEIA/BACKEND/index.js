@@ -369,67 +369,6 @@ app.post("/alterfolder", (req, res) => {
 
 /*------------------------------ALTERFOLDER--------------------------*/
 
-/*---------------------------------SENDTEAMS------------------------------*/
-app.post("/saveteams", (req, res) => {
-  const userId = req.body.id_usuario;
-  const titulo = req.body.titulo;
-
-  if (!userId || !titulo) {
-    res.status(400).send({ erro: "Usuário e(ou) título não encontrado " });
-    return;
-  }
-
-  db.query(
-    "SELECT * FROM team WHERE titulo = ? AND id_usuarios = ?",
-    [titulo, userId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.length === 0) {
-        db.query(
-          "INSERT INTO team (id_usuarios, titulo) VALUES (?, ?)",
-          [userId, titulo],
-          (err, resultInsert) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
-
-            res.status(201).send({ msg: "Time criado com sucesso" });
-          }
-        );
-      } else {
-        const content = req.body.content;
-        const preview = req.body.preview;
-        const docsId = req.body.docsId;
-
-        db.query(
-          "UPDATE team SET titulo = ?, content = ? WHERE id = ?",
-          [titulo, content, docsId],
-          (err, resultUpdate) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
-
-            if (resultUpdate.affectedRows === 0) {
-              res.status(404).send({ msg: "Bigas non inveni" });
-              return;
-            }
-
-            res.send({ msg: "Equipe atualizada com sucesso" });
-          }
-        );
-      }
-    }
-  );
-});
-
-/*---------------------------------SENDTEAMS------------------------------*/
-
 /*---------------------------------SENDPROJECT------------------------------*/
 app.post("/sendproject", (req, res) => {
   const userId = req.body.id_usuario;
@@ -847,13 +786,14 @@ app.post("/getfolderbyid", (req, res) => {
 
 /*---------------------------GETFOLDERBYID----------------------*/
 
-/*---------------------------GETTEAMBYID----------------------*/
-app.post("/getteam", (req, res) => {
-  const id_usuario = req.body.id_usuario;
+/*---------------------------GETUSERCREATEDTEAMS----------------------*/
+
+app.post("/getusercreatedteams", (req, res) => {
+  const userId = req.body.userId;
 
   db.query(
-    "SELECT * FROM team WHERE id_usuario= ?",
-    [id_usuario],
+    "SELECT * FROM team WHERE id_usuarios = ?",
+    [userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -865,15 +805,15 @@ app.post("/getteam", (req, res) => {
   );
 });
 
-/*---------------------------GETTEAMBYID----------------------*/
+/*---------------------------GETUSERCREATEDTEAMS----------------------*/
 
 /*---------------------------GETTEAMUSERBYID----------------------*/
 app.post("/getteamuser", (req, res) => {
-  const idteam = req.body.team;
+  const userId = req.body.userId;
 
   db.query(
-    "SELECT * FROM team_usuario WHERE idteam= ?",
-    [idteam],
+    "SELECT id_time FROM teams_usuario WHERE id_usuario = ?",
+    [userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -886,6 +826,22 @@ app.post("/getteamuser", (req, res) => {
 });
 
 /*---------------------------GETTEAMUSERBYID----------------------*/
+
+/*---------------------------GETTEAMBYID----------------------*/
+app.post("/getteambyid", (req, res) => {
+  const teamId = req.body.teamId;
+
+  db.query("SELECT * FROM team WHERE id = ?", [teamId], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    res.send(result);
+  });
+});
+
+/*---------------------------GETTEAMBYID----------------------*/
 
 /*-----------------------------GETCOMPARETIME---------------------------------*/
 app.post("/getcompare_time", (req, res) => {
@@ -947,15 +903,32 @@ app.post("/removefromfolder", (req, res) => {
 
 /*---------------------------REMOVEDOCFROMFOLDER----------------------*/
 
-/*---------------------------ADDDOCINTOTEAM----------------------*/
-app.post("/adduserintoteam", (req, res) => {
-  const teamuserId = req.body.teamuserId;
+/*---------------------------GETUSERIDBYEMAIL----------------------*/
+
+app.post("/getuseridbyemail", (req, res) => {
+  const email = req.body.email;
+
+  db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    res.send(result);
+  });
+});
+
+/*---------------------------GETUSERIDBYEMAIL----------------------*/
+
+/*---------------------------SENDTEAMINVITE----------------------*/
+
+app.post("/sendteaminvite", (req, res) => {
   const teamId = req.body.teamId;
-  const id_usuarioId = req.body.id_usuario;
+  const userId = req.body.userId;
 
   db.query(
-    "SELECT * FROM team_usuario WHERE id_time = ?",
-    [docsId, projectId],
+    "SELECT * FROM invites WHERE id_time = ? AND id_usuario = ?",
+    [teamId, userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -964,40 +937,112 @@ app.post("/adduserintoteam", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO team_usuario (teamId, id_usuarioId) VALUES ( ?, ?)",
-          [teamId, id_usuarioId],
-          (err, resultInsert) => {
+          "INSERT INTO invites (id_time, id_usuario) VALUES (?, ?)",
+          [teamId, userId],
+          (err, result) => {
             if (err) {
-              res.status(200).send(err);
+              res.status(500).send(err);
               return;
             }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
-          }
-        );
-      } else {
-        db.query(
-          "UPDATE team_usuario SET id_usuarioId = ? WHERE id = ?",
-          [id_usuarioId, teamuserId],
-          (err, resultUpdate) => {
-            if (err) {
-              res.status(201).send(err);
-              return;
-            }
-
-            if (resultUpdate.affectedRows === 0) {
-              res.status(404).send({ msg: "team nÃ£o encontrado" });
-              return;
-            }
-
-            res.send({ msg: "team atualizado com sucesso" });
+            res.send({ msg: "Convite enviado com sucesso" });
           }
         );
       }
     }
   );
 });
-/*---------------------------ADDDOCINTOTEAM----------------------*/
+
+/*---------------------------SENDTEAMINVITE----------------------*/
+
+/*---------------------------ADDUSERINTOTEAM----------------------*/
+app.post("/adduserintoteam", (req, res) => {
+  const teamId = req.body.teamId;
+  const id_usuario = req.body.userId;
+
+  db.query(
+    "SELECT * FROM teams_usuario WHERE id_time = ? AND id_usuario = ?",
+    [teamId, id_usuario],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO teams_usuario (id_time, id_usuario) VALUES ( ?, ?)",
+          [teamId, id_usuario],
+          (err, result) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            res.send({ msg: "Cadastrado com Ãªxito" });
+          }
+        );
+      }
+    }
+  );
+});
+/*---------------------------ADDUSERINTOTEAM----------------------*/
+
+/*---------------------------------SENDTEAMS------------------------------*/
+app.post("/saveteams", (req, res) => {
+  const userId = req.body.id_usuario;
+  const titulo = req.body.titulo;
+
+  if (!userId || !titulo) {
+    res.status(400).send({ erro: "Usuário e(ou) título não encontrado " });
+    return;
+  }
+
+  db.query(
+    "SELECT * FROM team WHERE titulo = ? AND id_usuarios = ?",
+    [titulo, userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO team (id_usuarios, titulo) VALUES (?, ?)",
+          [userId, titulo],
+          (err, resultInsert) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+            res.status(200).send({ msg: "Time criado com sucesso" });
+          }
+        );
+      } else {
+        db.query(
+          "UPDATE team SET titulo = ? WHERE id = ?",
+          [titulo],
+          (err, resultUpdate) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            if (resultUpdate.affectedRows === 0) {
+              res.status(404).send({ msg: "Bigas non inveni" });
+              return;
+            }
+
+            res.send({ msg: "Equipe atualizada com sucesso" });
+          }
+        );
+      }
+    }
+  );
+});
+
+/*---------------------------------SENDTEAMS------------------------------*/
 
 /*------------------------ICONUSER--------------------------------------*/
 app.post("/sendicon_user", (req, res) => {
@@ -1076,14 +1121,27 @@ app.post("/sendicon_team", (req, res) => {
 });
 
 /*------------------------ICONTEAM--------------------------------------*/
+
+app.listen(3001, () => {
+  console.log("Rodando na porta 3001");
+});
+
+/*  CABO. *-*   */
+
+
+/*------------------------ICONTEAM--------------------------------------*/
 /**/
 /*------------------------MAILSYSTEMS---------------------------------------*/
+
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
+
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
+
 /*------------------------REPORTSYSTEMS--------------------------------------*/
 /*------------------------REPORTSYSTEMS--------------------------------------*/
+
 /*------------------------MAILSYSTEMS--------------------------------------*/
 /**/
 app.listen(3001, () => {
