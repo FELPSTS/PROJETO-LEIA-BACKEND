@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
 
 const db = mysql.createPool({
   host: "localhost",
@@ -654,19 +653,41 @@ app.post("/deleteteam", (req, res) => {
 /*------------------------------GETUSER--------------------------*/
 app.post("/getuser", (req, res) => {
   const userId = req.body.id_usuario;
+  const remetente = req.body.id_remetente;
 
-  db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, result) => {
-    if (err) {
-      res.status(500).send(err);
-      return;
-    }
+  if (remetente) {
+    db.query(
+      "SELECT username FROM usuarios WHERE id = ?",
+      [remetente],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
 
-    if (result.length === 0) {
-      res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
-      return;
-    }
-    res.send(result);
-  });
+        if (result.length === 0) {
+          res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+          return;
+        }
+        res.send(result);
+      }
+    );
+  }
+
+  if (userId) {
+    db.query("SELECT * FROM usuarios WHERE id = ?", [userId], (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        return;
+      }
+      res.send(result);
+    });
+  }
 });
 
 /*------------------------------GETUSER--------------------------*/
@@ -831,15 +852,33 @@ app.post("/getteamuser", (req, res) => {
 /*---------------------------GETTEAMBYID----------------------*/
 app.post("/getteambyid", (req, res) => {
   const teamId = req.body.teamId;
+  const teamIdInvite = req.body.teamIdInvite;
 
-  db.query("SELECT * FROM team WHERE id = ?", [teamId], (err, result) => {
-    if (err) {
-      res.status(500).send(err);
-      return;
-    }
+  if (teamIdInvite) {
+    db.query(
+      "SELECT titulo FROM team WHERE id = ?",
+      [teamIdInvite],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
 
-    res.send(result);
-  });
+        res.send(result);
+      }
+    );
+  }
+
+  if (teamId) {
+    db.query("SELECT * FROM team WHERE id = ?", [teamId], (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    });
+  }
 });
 
 /*---------------------------GETTEAMBYID----------------------*/
@@ -925,11 +964,12 @@ app.post("/getuseridbyemail", (req, res) => {
 
 app.post("/sendteaminvite", (req, res) => {
   const teamId = req.body.teamId;
-  const userId = req.body.userId;
+  const remetente = req.body.remetenteId;
+  const destinatario = req.body.destinatarioId;
 
   db.query(
-    "SELECT * FROM invites WHERE id_time = ? AND id_usuario = ?",
-    [teamId, userId],
+    "SELECT * FROM invites WHERE id_time = ? AND id_destinatario = ? AND id_remetente = ?",
+    [teamId, destinatario, remetente],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -938,15 +978,15 @@ app.post("/sendteaminvite", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO invites (id_time, id_usuario) VALUES (?, ?)",
-          [teamId, userId],
+          "INSERT INTO invites (id_time, id_destinatario, id_remetente) VALUES (?, ?, ?)",
+          [teamId, destinatario, remetente],
           (err, result) => {
             if (err) {
               res.status(500).send(err);
               return;
             }
 
-            res.send({ msg: "Convite enviado com sucesso" });
+            res.send(result);
           }
         );
       }
@@ -955,6 +995,27 @@ app.post("/sendteaminvite", (req, res) => {
 });
 
 /*---------------------------SENDTEAMINVITE----------------------*/
+
+/*---------------------------GETINVITES----------------------*/
+
+app.post("/getinvites", (req, res) => {
+  const userId = req.body.userId;
+
+  db.query(
+    "SELECT * FROM invites WHERE id_destinatario = ? AND aceito = 0",
+    [userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETINVITES----------------------*/
 
 /*---------------------------ADDUSERINTOTEAM----------------------*/
 app.post("/adduserintoteam", (req, res) => {
