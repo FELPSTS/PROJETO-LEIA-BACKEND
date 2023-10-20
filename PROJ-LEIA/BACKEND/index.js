@@ -1190,7 +1190,6 @@ app.post("/sendicon_team", (req, res) => {
 
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 app.post ("/sendemail", (req,res)=>{
-  const senha = req.body.password;
   const nome = req.body.nome;
   const email = req.body.email;
 });
