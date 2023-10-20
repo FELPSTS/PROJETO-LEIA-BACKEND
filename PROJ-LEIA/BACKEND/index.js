@@ -1203,6 +1203,7 @@ app.post ("/sendemail", (req,res)=>{
     </p>
     </div>
     </body>
+    </head>
       `    };
 
     transporter.sendMail(mailOptions, (error, info) => {
