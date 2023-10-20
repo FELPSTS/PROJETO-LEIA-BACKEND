@@ -1156,7 +1156,7 @@ app.post ("/sendemail", (req,res)=>{
     const mailOptions = {
     from: emailuser,
     to: 'LEIA@gmail.com', 
-    subject: assunto,
+    subject: REPORTE,
     html: `
         <head>
         <style>     
