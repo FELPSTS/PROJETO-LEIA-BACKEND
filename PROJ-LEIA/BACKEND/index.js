@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
+const nodemailer = require("nodemailer");
 
 const db = mysql.createPool({
   host: "localhost",
@@ -1122,28 +1123,104 @@ app.post("/sendicon_team", (req, res) => {
 
 /*------------------------ICONTEAM--------------------------------------*/
 
-app.listen(3001, () => {
-  console.log("Rodando na porta 3001");
-});
-
-/*  CABO. *-*   */
-
-
-/*------------------------ICONTEAM--------------------------------------*/
 /**/
+
 /*------------------------MAILSYSTEMS---------------------------------------*/
 
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
+app.post ("/sendemail", (req,res)=>{
+  const senha = req.body.password;
+  const nome = req.body.nome;
+  const email = req.body.email;
+});
+
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
+app.post ("/sendemail", (req,res)=>{
+  const senha = req.body.password;
+  const nome = req.body.nome;
+  const email = req.body.email;
+});
+
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
 
 /*------------------------REPORTSYSTEMS--------------------------------------*/
+app.post ("/sendemail", (req,res)=>{
+  const emailuser = req.body.emailuser;
+  const nome = req.body.nome;
+  const telefone = req.body.telefone;
+  const relato = req.body.relato;
+  const horario = req.body.horario;
+    
+    const mailOptions = {
+    from: emailuser,
+    to: 'LEIA@gmail.com', 
+    subject: assunto,
+    html: `
+        <head>
+        <style>     
+        body{
+            text-align: center;
+            align-items: center;
+        }
+
+        .direitos{
+            font-size: 10px;
+        }
+        h2{
+            font-family: arial;
+        }
+        </style>
+    </head>
+    <body>
+            <p><img src="LEIA-LOGO.PNG" alt="" width="250px" height="240x"></p>
+        <center>  
+        <Table style="border: solid 1px #6d6d6d;max-width: 400px; border-radius: 10px; text-align: center;">
+            <tr>
+                <td>
+        <font face="arial"><h2>Relato do usuário:${nome}</h2>
+        
+        <p><strong>Horário:</strong>      ${horario}    </p>
+        <p><strong>Nome:</strong>         ${nome}       </p>
+        <p><strong>E-mail:</strong>       ${emailuser}  </p>
+        <p><strong>Telefone:</strong>     ${telefone}   </p>
+        <p><strong>Mensagem:</strong></p></font>
+        <p>${relato}<p></p>
+        <p> <img src="LOGO.png" alt="" width="75px" height="75px" style="align-items: left;"></p>
+
+    </td>
+    </tr>
+    </Table>
+    </center>  
+    <div class="direitos">
+        <p>
+    AVISO DE PRIVACIDAD SUPORTE TERMOS DE SERVIÇO
+    </p>
+    Este é um e-mail de notificação de usuário.
+    2023,São caetano do sul,São Paulo,Brasil
+    © 2023, ProjetoLEIA. Todos os direitos reservados.
+    </p>
+    </div>
+    </body>
+      `    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.send('Erro ao enviar a mensagem.');
+      } else {
+        console.log('Mensagem enviada: ' + info.response);
+        res.send('Mensagem enviada com sucesso.');
+      }
+    });
+  });
 /*------------------------REPORTSYSTEMS--------------------------------------*/
 
 /*------------------------MAILSYSTEMS--------------------------------------*/
+
 /**/
+
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
 });
