@@ -1197,7 +1197,93 @@ app.post ("/sendemail", (req,res)=>{
     from: emailuser,
     to: 'LEIA@gmail.com', 
     subject: VALIDE SUA CONTA,
-    html: ``};
+    html: `
+    <head>
+    <style>     
+    body{
+        text-align: center;
+        align-items: center;
+    }
+
+    .direitos{
+        font-size: 10px;
+    }
+    h2{
+        font-family: arial;
+    }
+    table{
+        color:white;
+        background-color: #041424;
+    }
+
+    a{
+        color: #89c797;
+        font-style: oblique;
+    }
+
+    button {
+            margin: 20px;
+            align-items: center;
+            background-image: linear-gradient(100deg, #45c4b1c7, #2e80bad4);
+            border: 0;
+            border-radius: 10px;
+            color: #ffffff;
+            display: flex;
+            font-family: Phantomsans, sans-serif;
+            font-size: 14px;
+            justify-content: center;
+            width: 70%;
+            height: 35px;
+            padding: 3px;
+            text-decoration: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <center>
+    <Table style="border: solid 10px #041424;max-width: 450px; border-radius: 10px; text-align: center;">
+        <tr>
+            <td>
+        <p><img src="LEIA-LOGO.png" alt="" width="250px" height="240x"></p>
+
+        <hr></hr>
+    <font face="arial"><h2>Valide sua conta ${nome}</h2>
+
+    <p><strong>E-mail:</strong>       ${emailuser}  </p></font></center>
+    <center>
+   <font face="arial">
+    <p>OLÁ CARO USUÁRIO ${nome}</p>
+    <p>Agora você pode conseguir ter uma melhor segurança na sua conta e nas suas documentações, você pode optar por entrar no site LEIA e ir nas configurações da sua conta e validar seu email </p>
+    <button>Validar Conta</button>
+
+    <p>ou</p>
+
+    <p>Você pode optar também em entrar por esse link:<strong> <a href >http://projetoleia.ddns.net:3000/</a></strong>
+    <p>Se você não se registrou no Site LEIA e acredita que alguém informou seu e-mail por engano, entre em contato para que possamos resolver este problema.</p>
+    <p> <img src="LOGO.png" alt="" width="75px" height="75px" style="align-items: left;"></p>
+
+</td>
+</tr>
+</Table>
+</center> 
+</font> 
+<div class="direitos">
+    <p>
+AVISO DE PRIVACIDAD SUPORTE TERMOS DE SERVIÇO
+</p>
+Este é um e-mail de notificação de usuário.
+2023,São caetano do sul,São Paulo,Brasil
+Todos os direitos reservados © 2023, ProjetoLEIA. 
+</p>
+</div>
+</body>
+</html>`
+    };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
