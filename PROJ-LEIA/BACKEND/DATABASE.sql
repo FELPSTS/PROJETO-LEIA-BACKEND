@@ -7,6 +7,7 @@ CREATE TABLE usuarios (
     email VARCHAR(45) NOT NULL,
     icon_user BLOB,
     password VARCHAR(200) NOT NULL
+    Verified BOOLEAN DEFAULT FALSE,	
 );
 SELECT * FROM usuarios; 
 
