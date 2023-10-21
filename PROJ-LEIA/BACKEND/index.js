@@ -2,12 +2,22 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
+const nodemailer = require('nodemailer');
 
 const db = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
   database: "registros",
+});
+
+// Configuração do transporte de e-mail com o SMTP do Gmail
+const transporter = nodemailer.createTransport({
+  service: 'Gmail', // ou 'Outlook', 'Yahoo', ou o servidor SMTP que você está usando
+  auth: {
+    user: 'seu_email@gmail.com', // Seu endereço de e-mail
+    pass: 'sua_senha' // Sua senha de e-mail (certifique-se de manter isso seguro)
+  }
 });
 /*--------------------------CONNECT BD----------------*/
 
@@ -1194,9 +1204,9 @@ app.post ("/sendemail", (req,res)=>{
   const nome = req.body.nome;
     
     const mailOptions = {
-    from: emailuser,
-    to: 'LEIA@gmail.com', 
-    subject: VALIDE SUA CONTA,
+    from: LEIA@gmail.com,
+    to: 'emailuser', 
+    subject: 'VALIDE SUA CONTA',
     html: `
     <head>
     <style>     
@@ -1263,7 +1273,7 @@ app.post ("/sendemail", (req,res)=>{
 
     <p>ou</p>
 
-    <p>Você pode optar também em entrar por esse link:<strong> <a href >http://projetoleia.ddns.net:3000/</a></strong>
+    <p>Você pode optar também em entrar por esse link:<strong> <a href='http://projetoleia.ddns.net:3000/'>http://projetoleia.ddns.net:3000/</a></strong>
     <p>Se você não se registrou no Site LEIA e acredita que alguém informou seu e-mail por engano, entre em contato para que possamos resolver este problema.</p>
     <p> <img src="LOGO.png" alt="" width="75px" height="75px" style="align-items: left;"></p>
 
@@ -1312,7 +1322,7 @@ app.post ("/sendemail", (req,res)=>{
     const mailOptions = {
     from: emailuser,
     to: 'LEIA@gmail.com', 
-    subject: REPORTE,
+    subject: 'REPORTE',
     html: `
         <head>
         <style>     
