@@ -253,7 +253,7 @@ app.post("/searchproject", (req, res) => {
 });
 /*---------------------------SEARCHTEAM----------------------*/
 
-/*------------------------------ALTERLOGIN==--------------------------*/
+/*------------------------------ALTERPASSWORD==--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
   const Apassword = req.body.oldpassword;
@@ -289,7 +289,7 @@ app.post("/alter", (req, res) => {
   );
 });
 
-/*------------------------------ALTERLOGIN--------------------------*/
+/*------------------------------ALTERPASSWORD--------------------------*/
 
 /*------------------------------ALTERPROJECT--------------------------*/
 app.post("/alterproject", (req, res) => {
@@ -1190,18 +1190,28 @@ app.post("/sendicon_team", (req, res) => {
 
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 app.post ("/sendemail", (req,res)=>{
+  const emailuser = req.body.emailuser;
   const nome = req.body.nome;
-  const email = req.body.email;
-});
+    
+    const mailOptions = {
+    from: emailuser,
+    to: 'LEIA@gmail.com', 
+    subject: VALIDE SUA CONTA,
+    html: ``};
 
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.send('Erro ao enviar a mensagem.');
+      } else {
+        console.log('Mensagem enviada: ' + info.response);
+        res.send('Mensagem enviada com sucesso.');
+      }
+    });
+  });
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
-app.post ("/sendemail", (req,res)=>{
-  const senha = req.body.password;
-  const nome = req.body.nome;
-  const email = req.body.email;
-});
 
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
 
@@ -1264,7 +1274,7 @@ app.post ("/sendemail", (req,res)=>{
     </div>
     </body>
     </head>
-      `    };
+      `};
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -1281,6 +1291,52 @@ app.post ("/sendemail", (req,res)=>{
 /*------------------------MAILSYSTEMS--------------------------------------*/
 
 /**/
+
+/*------------------------------VERIFIED--------------------------*/
+app.post("/verified", (req, res) => {
+  const userId = req.body.id_usuario;
+  const email = req.body.email;
+  const Verified = req.body.Verified;
+
+   if (email && Verified && userId) {
+    db.query(
+      "SELECT email FROM usuarios WHERE id = ?",
+      [userId],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
+        
+        if (result.length > 0) {
+          const existingEmail = result[0].email;
+
+          if (email === existingEmail) 
+            db.query(
+              "UPDATE usuarios SET Verified = 1 WHERE id = ?",
+              [userId],
+              (err, resultUpdate) => {
+                if (err) {
+                  res.status(500).send(err);
+                } else {
+                  res.send({ msg: "Alterado com sucesso" });
+                }
+              }
+            );
+          } else {
+            res.status(40).send({ error: "O email fornecido não corresponde ao email no banco de dados" });
+          }
+        } else {
+          res.status(505).send({ error: "Usuário não encontrado no banco de dados" });
+        }
+      }
+    );
+  } else {
+    res.status(404 ).send({ error: "Faltando email, Verified ou userId" });
+  }
+});
+
+/*------------------------------VERIFIED--------------------------*/
 
 app.listen(3001, () => {
   console.log("Rodando na porta 3001");
