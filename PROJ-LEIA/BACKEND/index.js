@@ -11,7 +11,6 @@ const db = mysql.createPool({
   database: "registros",
 });
 
-// Configuração do transporte de e-mail com o SMTP do Gmail
 const transporter = nodemailer.createTransport({
   service: 'Gmail', // ou 'Outlook', 'Yahoo', ou o servidor SMTP que você está usando
   auth: {
