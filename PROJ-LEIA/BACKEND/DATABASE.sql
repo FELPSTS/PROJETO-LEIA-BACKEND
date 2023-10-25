@@ -11,6 +11,15 @@ CREATE TABLE usuarios (
 );
 SELECT * FROM usuarios; 
 
+/*
+CREATE TABLE admins(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	userid INT,
+	FOREIGN KEY (userid) REFERENCES usuarios (id)
+);
+SELECT * FROM admins;
+*/
+
 CREATE TABLE team(
     id INT PRIMARY KEY AUTO_INCREMENT,
     id_usuarios INT,
@@ -83,9 +92,9 @@ drop table invites;
 DROP TABLE docs;
 DROP TABLE folder;
 DROP TABLE team;
+DROP TABLE teams_usuario;
 DROP TABLE docs;
 DROP TABLE usuarios;
-
-delete  from folder where id=11;
+/* DROP TABLE admins; */
 
 DROP DATABASE registros;
