@@ -3,6 +3,8 @@ const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const db = mysql.createPool({
   host: "localhost",
@@ -14,8 +16,8 @@ const db = mysql.createPool({
 const transporter = nodemailer.createTransport({
   service: 'Gmail', // ou 'Outlook', 'Yahoo', ou o servidor SMTP que você está usando
   auth: {
-    user: 'seu_email@gmail.com', // Seu endereço de e-mail
-    pass: 'sua_senha' // Sua senha de e-mail (certifique-se de manter isso seguro)
+    user: 'seu_email@gmail.com', // endereço de e-mail
+    pass: 'sua_senha' //senha de e-mail (certifique-se de manter isso seguro)
   }
 });
 /*--------------------------CONNECT BD----------------*/
@@ -34,57 +36,69 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
+  bcrypt.hash(password, 10, (err, hash) => {
     if (err) {
-      res.status(141).send(err);
+      res.status(500).send(err);
       return;
     }
-    if (result.length == 0) {
-      db.query(
-        "INSERT INTO usuarios (username, email, password) VALUES (?, ?, ?)",
-        [username, email, password],
-        (err, result) => {
-          if (err) {
-            res.status(141).send(err);
-            return;
-          }
 
-          res.send({ msg: "Cadastrado com Ãªxito" });
-        }
-      );
-    } else {
-      res.status(141).send({ msg: "UsuÃ¡rio jÃ¡ estÃ¡ cadastrado" });
-    }
+    db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        db.query(
+          "INSERT INTO usuarios (username, email, password) VALUES (?, ?, ?)",
+          [username, email, hash],
+          (err, result) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+
+            res.send({ msg: "Cadastrado com sucesso" });
+          }
+        );
+      } else {
+        res.status(409).send({ msg: "Usuário já está cadastrado" });
+      }
+    });
   });
 });
 
 /*--------------------------REGISTER----------------*/
+
+
 
 /*--------------------------LOGIN---------------*/
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  db.query(
-    "SELECT * FROM usuarios WHERE email = ? AND password = ?",
-    [email, password],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.length > 0) {
-        const user = result[0];
-        const userid = user.id;
-        res.send({ /*msg: "UsuÃ¡rio logado com sucesso",*/ userId: userid });
-      } else {
-        res.status(401).send({ msg: "Email ou senha incorretos" });
-      }
+  
+  db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
     }
-  );
-});
 
+    if (result.length === 1) {
+      const user = result[0];
+
+      bcrypt.compare(password, user.password, (err, isValid) => {
+        if (err || !isValid) {
+          res.status(401).send({ msg: "Email ou senha incorretos" });
+        } else {
+          res.send({ msg: "Usuário logado com sucesso", userId: user.id });
+        }
+      });
+    } else {
+      res.status(401).send({ msg: "Email ou senha incorretos" });
+    }
+  });
+});
 /*--------------------------LOGIN----------------*/
 
 /*--------------------------SAVEDOCS----------------*/
@@ -1203,7 +1217,7 @@ app.post ("/sendemail", (req,res)=>{
   const nome = req.body.nome;
     
     const mailOptions = {
-    from: LEIA@gmail.com,
+    from: 'LEIA@gmail.com',
     to: 'emailuser', 
     subject: 'VALIDE SUA CONTA',
     html: `
@@ -1291,8 +1305,8 @@ Todos os direitos reservados © 2023, ProjetoLEIA.
 </p>
 </div>
 </body>
-</html>`
-    };
+</html>`,
+ };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -1302,7 +1316,7 @@ Todos os direitos reservados © 2023, ProjetoLEIA.
         console.log('Mensagem enviada: ' + info.response);
         res.send('Mensagem enviada com sucesso.');
       }
-    });
+    })
   });
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 
@@ -1393,7 +1407,7 @@ app.post("/verified", (req, res) => {
   const email = req.body.email;
   const Verified = req.body.Verified;
 
-   if (email && Verified && userId) {
+  if (email && Verified && userId) {
     db.query(
       "SELECT email FROM usuarios WHERE id = ?",
       [userId],
@@ -1402,11 +1416,11 @@ app.post("/verified", (req, res) => {
           res.status(500).send(err);
           return;
         }
-        
+
         if (result.length > 0) {
           const existingEmail = result[0].email;
 
-          if (email === existingEmail) 
+          if (email === existingEmail) {
             db.query(
               "UPDATE usuarios SET Verified = 1 WHERE id = ?",
               [userId],
@@ -1419,18 +1433,17 @@ app.post("/verified", (req, res) => {
               }
             );
           } else {
-            res.status(40).send({ error: "O email fornecido não corresponde ao email no banco de dados" });
+            res.status(400).send({ error: "O email fornecido não corresponde ao email no banco de dados" });
           }
         } else {
-          res.status(505).send({ error: "Usuário não encontrado no banco de dados" });
+          res.status(404).send({ error: "Usuário não encontrado no banco de dados" });
         }
       }
     );
   } else {
-    res.status(404 ).send({ error: "Faltando email, Verified ou userId" });
+    res.status(400).send({ error: "Faltando email, Verified ou userId" });
   }
 });
-
 /*------------------------------VERIFIED--------------------------*/
 
 app.listen(3001, () => {
