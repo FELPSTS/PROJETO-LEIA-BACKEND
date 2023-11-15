@@ -2,9 +2,9 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const bcrypt = require('bcrypt');
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 const db = mysql.createPool({
   host: "localhost",
@@ -14,11 +14,11 @@ const db = mysql.createPool({
 });
 
 const transporter = nodemailer.createTransport({
-  service: 'Gmail', // ou 'Outlook', 'Yahoo', ou o servidor SMTP que você está usando
+  service: "Gmail", // ou 'Outlook', 'Yahoo', ou o servidor SMTP que você está usando
   auth: {
-    user: 'seu_email@gmail.com', // endereço de e-mail
-    pass: 'sua_senha' //senha de e-mail (certifique-se de manter isso seguro)
-  }
+    user: "seu_email@gmail.com", // endereço de e-mail
+    pass: "sua_senha", //senha de e-mail (certifique-se de manter isso seguro)
+  },
 });
 /*--------------------------CONNECT BD----------------*/
 
@@ -42,42 +42,43 @@ app.post("/register", (req, res) => {
       return;
     }
 
-    db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
+    db.query(
+      "SELECT * FROM usuarios WHERE email = ?",
+      [email],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
 
-      if (result.length === 0) {
-        db.query(
-          "INSERT INTO usuarios (username, email, password) VALUES (?, ?, ?)",
-          [username, email, hash],
-          (err, result) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
+        if (result.length === 0) {
+          db.query(
+            "INSERT INTO usuarios (username, email, password) VALUES (?, ?, ?)",
+            [username, email, hash],
+            (err, result) => {
+              if (err) {
+                res.status(500).send(err);
+                return;
+              }
+
+              res.send({ msg: "Cadastrado com sucesso" });
             }
-
-            res.send({ msg: "Cadastrado com sucesso" });
-          }
-        );
-      } else {
-        res.status(409).send({ msg: "Usuário já está cadastrado" });
+          );
+        } else {
+          res.status(409).send({ msg: "Usuário já está cadastrado" });
+        }
       }
-    });
+    );
   });
 });
 
 /*--------------------------REGISTER----------------*/
-
-
 
 /*--------------------------LOGIN---------------*/
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  
   db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
     if (err) {
       res.status(500).send(err);
@@ -791,6 +792,26 @@ app.post("/getprojects", (req, res) => {
 
 /*---------------------------GETPROEJCTS----------------------*/
 
+/*---------------------------GETTEAMPROJECTS----------------------*/
+app.post("/getteamprojects", (req, res) => {
+  const teamId = req.body.teamId;
+
+  db.query(
+    "SELECT * FROM project WHERE id_teams = ?",
+    [teamId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETTEAMPROJECTS----------------------*/
+
 /*---------------------------GETFOLDERBYPROJECTID----------------------*/
 app.post("/getfolders", (req, res) => {
   const projectId = req.body.id_project;
@@ -871,6 +892,26 @@ app.post("/getteamuser", (req, res) => {
 });
 
 /*---------------------------GETTEAMUSERBYID----------------------*/
+
+/*---------------------------GETTEAMOWNER----------------------*/
+app.post("/getteamowner", (req, res) => {
+  const teamId = req.body.teamId;
+
+  db.query(
+    "SELECT usuarios.username FROM usuarios JOIN team ON usuarios.id = team.id_usuarios WHERE team.id = ?",
+    [teamId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETTEAMOWNER----------------------*/
 
 /*---------------------------GETTEAMBYID----------------------*/
 app.post("/getteambyid", (req, res) => {
@@ -991,7 +1032,7 @@ app.post("/sendteaminvite", (req, res) => {
   const destinatario = req.body.destinatarioId;
 
   db.query(
-    "SELECT * FROM invites WHERE id_time = ? AND id_destinatario = ? AND id_remetente = ?",
+    "SELECT * FROM invites WHERE id_time = ? AND id_destinatario = ? AND id_remetente = ? AND aceito = 0",
     [teamId, destinatario, remetente],
     (err, result) => {
       if (err) {
@@ -1039,6 +1080,113 @@ app.post("/getinvites", (req, res) => {
 });
 
 /*---------------------------GETINVITES----------------------*/
+
+/*---------------------------INVITERESPONSE----------------------*/
+
+app.post("/inviteresponse", (req, res) => {
+  const response = req.body.response;
+  const inviteId = req.body.inviteId;
+  const teamId = req.body.teamId;
+  const userId = req.body.userId;
+
+  if (response === 1) {
+    db.query(
+      "SELECT * FROM teams_usuario WHERE id_time = ? AND id_usuario = ?",
+      [teamId, userId],
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
+
+        if (result.length === 0) {
+          db.query(
+            "UPDATE invites SET aceito = ? WHERE id = ?",
+            [response, inviteId],
+            (err, result) => {
+              if (err) {
+                res.status(452).send(err);
+                return;
+              }
+
+              res.send(result);
+            }
+          );
+          db.query(
+            "INSERT INTO teams_usuario (id_time, id_usuario) values (?, ?) ",
+            [teamId, userId],
+            (err, result) => {
+              if (err) {
+                res.status(452).send(err);
+                return;
+              }
+
+              res.send(result);
+            }
+          );
+        } else {
+          res.status(500).send({ erro: "Você já faz parte deste time" });
+        }
+      }
+    );
+  } else if (response === 2) {
+    db.query(
+      "UPDATE invites SET aceito = ? WHERE id = ?",
+      [response, inviteId],
+      (err, result) => {
+        if (err) {
+          res.status(452).send(err);
+          return;
+        }
+
+        res.send(result);
+      }
+    );
+  }
+});
+
+/*---------------------------INVITERESPONSE----------------------*/
+
+/*------------------------------GETUSERNAMEBYID--------------------------*/
+
+app.post("/getusernamebyid", (req, res) => {
+  const userId = req.body.userId;
+
+  db.query(
+    "SELECT username from usuarios WHERE id = ?",
+    [userId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*------------------------------GETUSERNAMEBYID--------------------------*/
+
+/*---------------------------GETUSERBYTEAMID-------------------*/
+app.post("/getuserbyteamid", (req, res) => {
+  const id_time = req.body.id_time;
+
+  db.query(
+    "SELECT ID_usuario FROM teams_usuario WHERE id_time = ?",
+    [id_time],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      res.send(result);
+    }
+  );
+});
+
+/*---------------------------GETUSERBYTEAMID-------------------*/
 
 /*---------------------------ADDUSERINTOTEAM----------------------*/
 app.post("/adduserintoteam", (req, res) => {
@@ -1212,14 +1360,14 @@ app.post("/sendicon_team", (req, res) => {
 /*------------------------MAILSYSTEMS---------------------------------------*/
 
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
-app.post ("/sendemail", (req,res)=>{
+app.post("/sendemail", (req, res) => {
   const emailuser = req.body.emailuser;
   const nome = req.body.nome;
-    
-    const mailOptions = {
-    from: 'LEIA@gmail.com',
-    to: 'emailuser', 
-    subject: 'VALIDE SUA CONTA',
+
+  const mailOptions = {
+    from: "LEIA@gmail.com",
+    to: "emailuser",
+    subject: "VALIDE SUA CONTA",
     html: `
     <head>
     <style>     
@@ -1306,18 +1454,18 @@ Todos os direitos reservados © 2023, ProjetoLEIA.
 </div>
 </body>
 </html>`,
- };
+  };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-        res.send('Erro ao enviar a mensagem.');
-      } else {
-        console.log('Mensagem enviada: ' + info.response);
-        res.send('Mensagem enviada com sucesso.');
-      }
-    })
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      res.send("Erro ao enviar a mensagem.");
+    } else {
+      console.log("Mensagem enviada: " + info.response);
+      res.send("Mensagem enviada com sucesso.");
+    }
   });
+});
 /*------------------------VALIDATIONSYSTEMS--------------------------------------*/
 
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
@@ -1325,17 +1473,17 @@ Todos os direitos reservados © 2023, ProjetoLEIA.
 /*------------------------FOTGOTSYSTEMS--------------------------------------*/
 
 /*------------------------REPORTSYSTEMS--------------------------------------*/
-app.post ("/sendemail", (req,res)=>{
+app.post("/sendemail", (req, res) => {
   const emailuser = req.body.emailuser;
   const nome = req.body.nome;
   const telefone = req.body.telefone;
   const relato = req.body.relato;
   const horario = req.body.horario;
-    
-    const mailOptions = {
+
+  const mailOptions = {
     from: emailuser,
-    to: 'LEIA@gmail.com', 
-    subject: 'REPORTE',
+    to: "LEIA@gmail.com",
+    subject: "REPORTE",
     html: `
         <head>
         <style>     
@@ -1383,18 +1531,19 @@ app.post ("/sendemail", (req,res)=>{
     </div>
     </body>
     </head>
-      `};
+      `,
+  };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-        res.send('Erro ao enviar a mensagem.');
-      } else {
-        console.log('Mensagem enviada: ' + info.response);
-        res.send('Mensagem enviada com sucesso.');
-      }
-    });
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      res.send("Erro ao enviar a mensagem.");
+    } else {
+      console.log("Mensagem enviada: " + info.response);
+      res.send("Mensagem enviada com sucesso.");
+    }
   });
+});
 /*------------------------REPORTSYSTEMS--------------------------------------*/
 
 /*------------------------MAILSYSTEMS--------------------------------------*/
@@ -1433,10 +1582,15 @@ app.post("/verified", (req, res) => {
               }
             );
           } else {
-            res.status(400).send({ error: "O email fornecido não corresponde ao email no banco de dados" });
+            res.status(400).send({
+              error:
+                "O email fornecido não corresponde ao email no banco de dados",
+            });
           }
         } else {
-          res.status(404).send({ error: "Usuário não encontrado no banco de dados" });
+          res
+            .status(404)
+            .send({ error: "Usuário não encontrado no banco de dados" });
         }
       }
     );
