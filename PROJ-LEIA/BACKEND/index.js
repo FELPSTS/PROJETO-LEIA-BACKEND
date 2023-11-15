@@ -516,12 +516,6 @@ app.post("/UserDelete", (req, res) => {
             res.status(500).send(err);
             return;
           }
-
-          if (result.affectedRows === 0) {
-            res.status(404).send({ msg: "Registro nÃ£o encontrado" });
-          } else {
-            res.send({ msg: "Registro deletado com Ãªxito" });
-          }
         }
       );
     }
@@ -557,12 +551,6 @@ app.post("/deletecard", (req, res) => {
             res.status(500).send(err);
             return;
           }
-
-          if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Documento nÃ£o encontrado" });
-          } else {
-            res.send({ msg: "Documento deletado com Ãªxito" });
-          }
         }
       );
     }
@@ -579,15 +567,11 @@ app.post("/deleteprojects", (req, res) => {
     "DELETE FROM project WHERE id_usuario = ? AND id = ?  ",
     [userId, projectId],
     (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.affectedRows === 0) {
-        res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
-      } else {
-        res.send({ msg: "Projeto deletado com Ãªxito" });
+      (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
       }
     }
   );
@@ -621,14 +605,8 @@ app.post("/deletefolder", (req, res) => {
             res.status(500).send(err);
             return;
           }
-
-          if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
-          } else {
-            res.send({ msg: "Projeto deletado com Ãªxito" });
-          }
         }
-      );
+     );
     }
   );
 });
@@ -656,23 +634,18 @@ app.post("/deleteteam", (req, res) => {
       db.query(
         "DELETE FROM team WHERE id_usuario = ? AND id_team = ?",
         [userId, teamId],
-        (err, result) => {
-          if (err) {
-            res.status(500).send(err);
-            return;
-          }
-
-          if (result.affectedRows === 0) {
-            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
-          } else {
-            res.send({ msg: "Projeto deletado com Ãªxito" });
-          }
-        }
-      );
+          (err, result) => {
+            if (err) {
+              res.status(500).send(err);
+              return;
+            }
+          }      
+    );
     }
   );
 });
 /*--------------------------------------DELETETEAM------------------------------------*/
+
 
 /*------------------------------GETUSER--------------------------*/
 app.post("/getuser", (req, res) => {
@@ -1007,6 +980,40 @@ app.post("/removefromfolder", (req, res) => {
 
 /*---------------------------REMOVEDOCFROMFOLDER----------------------*/
 
+/*--------------------------------------REMOVEUSERFROMTEAM------------------------------------*/
+app.post("/removeuserfromteam", (req, res) => {
+  const userId = req.body.id_usuario;
+  const teamId = req.body.id_team;
+
+  db.query(
+    "SELECT * FROM teams WHERE id = ? AND id_usuario = ?",
+    [userId, teamId],
+    (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.length === 0) {
+        res.send({ msg: "time nÃ£o encontrado" });
+        return;
+      }
+
+      db.query(
+        "DELETE FROM teams WHERE id_usuario = ? AND id_time = ?",
+        [userId, teamId],
+        (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+        }
+      );
+    }
+  );
+});
+/*--------------------------------------REMOVEUSERFROMTEAM------------------------------------*/
+
 /*---------------------------GETUSERIDBYEMAIL----------------------*/
 
 app.post("/getuseridbyemail", (req, res) => {
@@ -1082,7 +1089,6 @@ app.post("/getinvites", (req, res) => {
 /*---------------------------GETINVITES----------------------*/
 
 /*---------------------------INVITERESPONSE----------------------*/
-
 app.post("/inviteresponse", (req, res) => {
   const response = req.body.response;
   const inviteId = req.body.inviteId;
@@ -1105,7 +1111,7 @@ app.post("/inviteresponse", (req, res) => {
             [response, inviteId],
             (err, result) => {
               if (err) {
-                res.status(452).send(err);
+                res.status(400).send(err);
                 return;
               }
 
@@ -1117,7 +1123,7 @@ app.post("/inviteresponse", (req, res) => {
             [teamId, userId],
             (err, result) => {
               if (err) {
-                res.status(452).send(err);
+                res.status(403).send(err);
                 return;
               }
 
@@ -1135,12 +1141,13 @@ app.post("/inviteresponse", (req, res) => {
       [response, inviteId],
       (err, result) => {
         if (err) {
-          res.status(452).send(err);
+          res.status(402).send(err);
           return;
         }
 
         res.send(result);
       }
+     
     );
   }
 });
