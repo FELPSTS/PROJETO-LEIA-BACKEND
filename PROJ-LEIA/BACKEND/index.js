@@ -277,15 +277,18 @@ app.post("/searchproject", (req, res) => {
 });
 /*---------------------------SEARCHTEAM----------------------*/
 
-/*------------------------------ALTERPASSWORD==--------------------------*/
+/*------------------------------ALTERPASSWORD--------------------------*/
+const bcrypt = require('bcrypt');
+
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
   const Apassword = req.body.oldpassword;
   const Npassword = req.body.newpassword;
 
+  // Consulta para obter a senha hash do usuário
   db.query(
-    "SELECT * FROM usuarios WHERE id = ? AND password = ?",
-    [userId, Apassword],
+    "SELECT password_hash FROM usuarios WHERE id = ?",
+    [userId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -293,26 +296,47 @@ app.post("/alter", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
+        res.send({ msg: "Usuário não encontrado" });
         return;
       }
 
-      db.query(
-        "UPDATE usuarios SET password = ? Where id= ?",
-        [Npassword, userId],
-        (err, resultInsert) => {
+      const hashedPassword = result[0].password_hash;
+
+      // Compara a senha antiga com a senha hash armazenada
+      bcrypt.compare(Apassword, hashedPassword, (err, passwordMatch) => {
+        if (err) {
+          res.status(500).send(err);
+          return;
+        }
+
+        if (!passwordMatch) {
+          res.send({ msg: "Senha antiga incorreta" });
+          return;
+        }
+
+        bcrypt.hash(Npassword, 10, (err, hashedNewPassword) => {
           if (err) {
             res.status(500).send(err);
             return;
           }
 
-          res.send({ msg: "Alterado com sucesso" });
-        }
-      );
+          db.query(
+            "UPDATE usuarios SET password_hash = ? WHERE id = ?",
+            [hashedNewPassword, userId],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(500).send(err);
+                return;
+              }
+
+              res.send({ msg: "Alterado com sucesso" });
+            }
+          );
+        });
+      });
     }
   );
 });
-
 /*------------------------------ALTERPASSWORD--------------------------*/
 
 /*------------------------------ALTERPROJECT--------------------------*/
