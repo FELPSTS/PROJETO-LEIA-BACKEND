@@ -277,18 +277,15 @@ app.post("/searchproject", (req, res) => {
 });
 /*---------------------------SEARCHTEAM----------------------*/
 
-/*------------------------------ALTERPASSWORD--------------------------*/
-const bcrypt = require('bcrypt');
-
+/*------------------------------ALTERPASSWORD==--------------------------*/
 app.post("/alter", (req, res) => {
   const userId = req.body.id_usuario;
   const Apassword = req.body.oldpassword;
   const Npassword = req.body.newpassword;
 
-  // Consulta para obter a senha hash do usuário
   db.query(
-    "SELECT password_hash FROM usuarios WHERE id = ?",
-    [userId],
+    "SELECT * FROM usuarios WHERE id = ? AND password = ?",
+    [userId, Apassword],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
@@ -296,47 +293,26 @@ app.post("/alter", (req, res) => {
       }
 
       if (result.length === 0) {
-        res.send({ msg: "Usuário não encontrado" });
+        res.send({ msg: "UsuÃ¡rio nÃ£o encontrado" });
         return;
       }
 
-      const hashedPassword = result[0].password_hash;
-
-      // Compara a senha antiga com a senha hash armazenada
-      bcrypt.compare(Apassword, hashedPassword, (err, passwordMatch) => {
-        if (err) {
-          res.status(500).send(err);
-          return;
-        }
-
-        if (!passwordMatch) {
-          res.send({ msg: "Senha antiga incorreta" });
-          return;
-        }
-
-        bcrypt.hash(Npassword, 10, (err, hashedNewPassword) => {
+      db.query(
+        "UPDATE usuarios SET password = ? Where id= ?",
+        [Npassword, userId],
+        (err, resultInsert) => {
           if (err) {
             res.status(500).send(err);
             return;
           }
 
-          db.query(
-            "UPDATE usuarios SET password_hash = ? WHERE id = ?",
-            [hashedNewPassword, userId],
-            (err, resultInsert) => {
-              if (err) {
-                res.status(500).send(err);
-                return;
-              }
-
-              res.send({ msg: "Alterado com sucesso" });
-            }
-          );
-        });
-      });
+          res.send({ msg: "Alterado com sucesso" });
+        }
+      );
     }
   );
 });
+
 /*------------------------------ALTERPASSWORD--------------------------*/
 
 /*------------------------------ALTERPROJECT--------------------------*/
@@ -423,48 +399,78 @@ app.post("/sendproject", (req, res) => {
   const projectId = req.body.projectId;
   const titulo = req.body.titulo;
   const descricao = req.body.descricao;
-  const team_id = 1;
+  const teamId = req.body.teamId;
 
-  if (!team_id || !titulo) {
-    res.status(400).send({ erro: "Omnes agros impleri" });
+  if (!titulo) {
+    res.status(400).send({ erro: "Preencha todos os campos" });
     return;
   }
 
   db.query(
-    "SELECT * FROM project WHERE titulo = ? AND id_usuario = ? ",
-    [titulo, userId],
+    "SELECT * FROM project WHERE titulo = ? AND id_usuario = ?",
+    [titulo, userId, projectId],
     (err, result) => {
       if (err) {
         res.status(500).send(err);
         return;
       }
 
-      if (result.length === 0) {
-        db.query(
-          "INSERT INTO project (id_usuario, titulo, descricao) VALUES ( ?, ?, ?)",
-          [userId, titulo, descricao],
-          (err, resultInsert) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
+      if ((result.length === 0) & (projectId === null)) {
+        if (teamId) {
+          db.query(
+            "INSERT INTO project (id_usuario, titulo, descricao, id_teams) VALUES ( ?, ?, ?, ?)",
+            [userId, titulo, descricao, teamId],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(500).send(err);
+                return;
+              }
 
-            res.send({ msg: "Cadastrado com Ãªxito" });
-          }
-        );
+              res.send({ msg: "Cadastrado com Ãªxito" });
+            }
+          );
+        } else {
+          db.query(
+            "INSERT INTO project (id_usuario, titulo, descricao) VALUES ( ?, ?, ? )",
+            [userId, titulo, descricao],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(500).send(err);
+                return;
+              }
+
+              res.send({ msg: "Cadastrado com Ãªxito" });
+            }
+          );
+        }
       } else {
-        db.query(
-          "UPDATE project SET titulo = ? AND descricao= ? WHERE id= ?",
-          [titulo, descricao, projectId],
-          (err, resultInsert) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
+        if (teamId) {
+          db.query(
+            "UPDATE project SET titulo = ?, descricao = ?, id_teams = ? WHERE id = ?",
+            [titulo, descricao, teamId, projectId],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(500).send(err);
+                return;
+              }
 
-            res.send({ msg: "Alterado com sucesso" });
-          }
-        );
+              res.send({ msg: "Alterado com sucesso 1" });
+            }
+          );
+        } else if (teamId === 0) {
+          db.query(
+            "UPDATE project SET titulo = ?, descricao = ?, id_teams = null WHERE id = ?",
+            [titulo, descricao, projectId],
+            (err, resultInsert) => {
+              if (err) {
+                res.status(500).send(err);
+                return;
+              }
+
+              res.send({ msg: "Alterado com sucesso 2" });
+            }
+          );
+        }
       }
     }
   );
@@ -540,6 +546,12 @@ app.post("/UserDelete", (req, res) => {
             res.status(500).send(err);
             return;
           }
+
+          if (result.affectedRows === 0) {
+            res.status(404).send({ msg: "Registro nÃ£o encontrado" });
+          } else {
+            res.send({ msg: "Registro deletado com Ãªxito" });
+          }
         }
       );
     }
@@ -575,6 +587,12 @@ app.post("/deletecard", (req, res) => {
             res.status(500).send(err);
             return;
           }
+
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Documento nÃ£o encontrado" });
+          } else {
+            res.send({ msg: "Documento deletado com Ãªxito" });
+          }
         }
       );
     }
@@ -591,11 +609,15 @@ app.post("/deleteprojects", (req, res) => {
     "DELETE FROM project WHERE id_usuario = ? AND id = ?  ",
     [userId, projectId],
     (err, result) => {
-      (err, result) => {
-        if (err) {
-          res.status(500).send(err);
-          return;
-        }
+      if (err) {
+        res.status(500).send(err);
+        return;
+      }
+
+      if (result.affectedRows === 0) {
+        res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
+      } else {
+        res.send({ msg: "Projeto deletado com Ãªxito" });
       }
     }
   );
@@ -629,8 +651,14 @@ app.post("/deletefolder", (req, res) => {
             res.status(500).send(err);
             return;
           }
+
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
+          } else {
+            res.send({ msg: "Projeto deletado com Ãªxito" });
+          }
         }
-     );
+      );
     }
   );
 });
@@ -658,18 +686,23 @@ app.post("/deleteteam", (req, res) => {
       db.query(
         "DELETE FROM team WHERE id_usuario = ? AND id_team = ?",
         [userId, teamId],
-          (err, result) => {
-            if (err) {
-              res.status(500).send(err);
-              return;
-            }
-          }      
-    );
+        (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+            return;
+          }
+
+          if (result.affectedRows === 0) {
+            res.status(500).send({ msg: "Projeto nÃ£o encontrado" });
+          } else {
+            res.send({ msg: "Projeto deletado com Ãªxito" });
+          }
+        }
+      );
     }
   );
 });
 /*--------------------------------------DELETETEAM------------------------------------*/
-
 
 /*------------------------------GETUSER--------------------------*/
 app.post("/getuser", (req, res) => {
@@ -789,6 +822,22 @@ app.post("/getprojects", (req, res) => {
 
 /*---------------------------GETPROEJCTS----------------------*/
 
+/*---------------------------GETPROJECTBYID----------------------*/
+app.post("/getprojectbyid", (req, res) => {
+  const projectId = req.body.projectId;
+
+  db.query("SELECT * FROM project WHERE id = ?", [projectId], (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+      return;
+    }
+
+    res.send(result);
+  });
+});
+
+/*---------------------------GETPROJECTBYID----------------------*/
+
 /*---------------------------GETTEAMPROJECTS----------------------*/
 app.post("/getteamprojects", (req, res) => {
   const teamId = req.body.teamId;
@@ -875,7 +924,7 @@ app.post("/getteamuser", (req, res) => {
   const userId = req.body.userId;
 
   db.query(
-    "SELECT id_time FROM teams_usuario WHERE id_usuario = ?",
+    "SELECT id_time FROM teams WHERE id_usuario = ?",
     [userId],
     (err, result) => {
       if (err) {
@@ -1004,40 +1053,6 @@ app.post("/removefromfolder", (req, res) => {
 
 /*---------------------------REMOVEDOCFROMFOLDER----------------------*/
 
-/*--------------------------------------REMOVEUSERFROMTEAM------------------------------------*/
-app.post("/removeuserfromteam", (req, res) => {
-  const userId = req.body.id_usuario;
-  const teamId = req.body.id_team;
-
-  db.query(
-    "SELECT * FROM teams WHERE id = ? AND id_usuario = ?",
-    [userId, teamId],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-
-      if (result.length === 0) {
-        res.send({ msg: "time nÃ£o encontrado" });
-        return;
-      }
-
-      db.query(
-        "DELETE FROM teams WHERE id_usuario = ? AND id_time = ?",
-        [userId, teamId],
-        (err, result) => {
-          if (err) {
-            res.status(500).send(err);
-            return;
-          }
-        }
-      );
-    }
-  );
-});
-/*--------------------------------------REMOVEUSERFROMTEAM------------------------------------*/
-
 /*---------------------------GETUSERIDBYEMAIL----------------------*/
 
 app.post("/getuseridbyemail", (req, res) => {
@@ -1057,36 +1072,60 @@ app.post("/getuseridbyemail", (req, res) => {
 
 /*---------------------------SENDTEAMINVITE----------------------*/
 
-app.post("/sendteaminvite", (req, res) => {
-  const teamId = req.body.teamId;
-  const remetente = req.body.remetenteId;
-  const destinatario = req.body.destinatarioId;
+app.post("/sendteaminvite", async (req, res) => {
+  try {
+    const teamId = req.body.teamId;
+    const remetente = req.body.remetenteId;
+    const email = req.body.email;
 
-  db.query(
-    "SELECT * FROM invites WHERE id_time = ? AND id_destinatario = ? AND id_remetente = ? AND aceito = 0",
-    [teamId, destinatario, remetente],
-    (err, result) => {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
+    const destinatario = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT id FROM usuarios WHERE email = ?",
+        [email],
+        (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result[0].id);
+          }
+        }
+      );
+    });
 
-      if (result.length === 0) {
+    const existingInvites = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT * FROM invites WHERE id_time = ? AND id_destinatario = ? AND id_remetente = ? AND aceito = 0",
+        [teamId, destinatario, remetente],
+        (err, result) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    });
+
+    if (existingInvites.length === 0) {
+      await new Promise((resolve, reject) => {
         db.query(
           "INSERT INTO invites (id_time, id_destinatario, id_remetente) VALUES (?, ?, ?)",
           [teamId, destinatario, remetente],
           (err, result) => {
             if (err) {
-              res.status(500).send(err);
-              return;
+              reject(err);
+            } else {
+              resolve(result);
             }
-
-            res.send(result);
           }
         );
-      }
+      });
     }
-  );
+
+    res.send("Operação concluída com sucesso");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 /*---------------------------SENDTEAMINVITE----------------------*/
@@ -1113,6 +1152,7 @@ app.post("/getinvites", (req, res) => {
 /*---------------------------GETINVITES----------------------*/
 
 /*---------------------------INVITERESPONSE----------------------*/
+
 app.post("/inviteresponse", (req, res) => {
   const response = req.body.response;
   const inviteId = req.body.inviteId;
@@ -1121,7 +1161,7 @@ app.post("/inviteresponse", (req, res) => {
 
   if (response === 1) {
     db.query(
-      "SELECT * FROM teams_usuario WHERE id_time = ? AND id_usuario = ?",
+      "SELECT * FROM teams WHERE id_time = ? AND id_usuario = ?",
       [teamId, userId],
       (err, result) => {
         if (err) {
@@ -1133,25 +1173,24 @@ app.post("/inviteresponse", (req, res) => {
           db.query(
             "UPDATE invites SET aceito = ? WHERE id = ?",
             [response, inviteId],
-            (err, result) => {
-              if (err) {
-                res.status(400).send(err);
+            (errUpdate, resultUpdate) => {
+              if (errUpdate) {
+                res.status(452).send(errUpdate);
                 return;
               }
 
-              res.send(result);
-            }
-          );
-          db.query(
-            "INSERT INTO teams_usuario (id_time, id_usuario) values (?, ?) ",
-            [teamId, userId],
-            (err, result) => {
-              if (err) {
-                res.status(403).send(err);
-                return;
-              }
+              db.query(
+                "INSERT INTO teams (id_time, id_usuario) VALUES (?, ?)",
+                [teamId, userId],
+                (errInsert, resultInsert) => {
+                  if (errInsert) {
+                    res.status(452).send(errInsert);
+                    return;
+                  }
 
-              res.send(result);
+                  res.send(resultInsert);
+                }
+              );
             }
           );
         } else {
@@ -1165,13 +1204,12 @@ app.post("/inviteresponse", (req, res) => {
       [response, inviteId],
       (err, result) => {
         if (err) {
-          res.status(402).send(err);
+          res.status(452).send(err);
           return;
         }
 
         res.send(result);
       }
-     
     );
   }
 });
@@ -1204,7 +1242,7 @@ app.post("/getuserbyteamid", (req, res) => {
   const id_time = req.body.id_time;
 
   db.query(
-    "SELECT ID_usuario FROM teams_usuario WHERE id_time = ?",
+    "SELECT ID_usuario FROM teams WHERE id_time = ?",
     [id_time],
     (err, result) => {
       if (err) {
@@ -1225,7 +1263,7 @@ app.post("/adduserintoteam", (req, res) => {
   const id_usuario = req.body.userId;
 
   db.query(
-    "SELECT * FROM teams_usuario WHERE id_time = ? AND id_usuario = ?",
+    "SELECT * FROM teams WHERE id_time = ? AND id_usuario = ?",
     [teamId, id_usuario],
     (err, result) => {
       if (err) {
@@ -1235,7 +1273,7 @@ app.post("/adduserintoteam", (req, res) => {
 
       if (result.length === 0) {
         db.query(
-          "INSERT INTO teams_usuario (id_time, id_usuario) VALUES ( ?, ?)",
+          "INSERT INTO teams (id_time, id_usuario) VALUES ( ?, ?)",
           [teamId, id_usuario],
           (err, result) => {
             if (err) {
@@ -1251,6 +1289,42 @@ app.post("/adduserintoteam", (req, res) => {
   );
 });
 /*---------------------------ADDUSERINTOTEAM----------------------*/
+
+/*--------------------------------------REMOVEUSERFROMTEAM------------------------------------*/
+app.post("/removeuserfromteam", (req, res) => {
+  const userId = req.body.userId;
+  const teamId = req.body.teamId;
+
+  db.query(
+    "SELECT * FROM teams WHERE id_time = ? AND id_usuario = ?",
+    [teamId, userId],
+    (errSelect, selectResult) => {
+      if (errSelect) {
+        res.status(500).send(errSelect);
+        return;
+      }
+
+      if (selectResult.length === 0) {
+        res.send({ msg: "time não encontrado" });
+        return;
+      } else {
+        db.query(
+          "DELETE FROM teams WHERE id_usuario = ? AND id_time = ?",
+          [userId, teamId],
+          (errDelete, deleteResult) => {
+            if (errDelete) {
+              res.status(500).send(errDelete);
+              return;
+            }
+
+            res.send({ msg: "Usuário removido do time com sucesso" });
+          }
+        );
+      }
+    }
+  );
+});
+/*--------------------------------------REMOVEUSERFROMTEAM------------------------------------*/
 
 /*---------------------------------SENDTEAMS------------------------------*/
 app.post("/saveteams", (req, res) => {
