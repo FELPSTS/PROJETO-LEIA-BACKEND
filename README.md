@@ -17,6 +17,6 @@ Features
 
 * API integration: Supports various tools and services to optimize the development process.
 
-* Technologies: Built with React on the front-end, MongoDB for data storage, and SQL for handling relational databases.
+* Technologies: Built with React on the front-end, Node.js for back-end and SQL for handling relational databases.
 
 LEIA was created as part of the final project for the technical course in Systems Analysis and Development. The idea was to develop a platform that not only generates documentation automatically but also facilitates collaboration and organization within development teams.
